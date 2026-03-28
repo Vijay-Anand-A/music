@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Anandhavruksham Music School</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <span class="music-icon">🎵</span>
+                </div>
+                <h1>Anandhavruksham</h1>
+                <p>Music School</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username / Email</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <div class="login-footer">
+                <p>Don't have an account? <a href="#">Register Now</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

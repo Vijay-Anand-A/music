@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Anandhavruksham Music School</title>
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-music"></i>
+                <span>AV Music</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <a href="current_students.html">
+                        <li class="active">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Current Student</span>
+                        </li>
+                    </a>
+                    <a href="admission_fees.html">
+                        <li>
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Admission Fees</span>
+                        </li>
+                    </a>
+                    <a href="monthly_fees.html">
+                        <li>
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Monthly Fees</span>
+                        </li>
+                    </a>
+                    <a href="fees_report.html">
+                        <li>
+                            <i class="fas fa-chart-line"></i>
+                            <span>Fees Report</span>
+                        </li>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="settings.html">
+                        <li>
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </li>
+                    </a>
+                    <a href="change_password.html">
+                        <li>
+                            <i class="fas fa-key"></i>
+                            <span>Change Password</span>
+                        </li>
+                    </a>
+                    <a href="#" class="logout-item">
+                        <li>
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </li>
+                    </a>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1 id="page-title">Current Student</h1>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6a11cb&color=fff" alt="Profile">
+                </div>
+            </header>
+            
+            <section id="content-area" class="content-area">
+                <!-- Content will be dynamically loaded here -->
+                <div class="welcome-card">
+                    <h2>Welcome back, Admin!</h2>
+                    <p>Select a menu item from the sidebar to manage the music school.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="dashboard-script.js"></script>
+</body>
+</html>

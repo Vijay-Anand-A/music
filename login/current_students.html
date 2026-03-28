@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Students | AV Music School</title>
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-music"></i>
+                <span>AV Music</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <a href="current_students.html">
+                        <li class="active">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Current Student</span>
+                        </li>
+                    </a>
+                    <a href="admission_fees.html">
+                        <li>
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Admission Fees</span>
+                        </li>
+                    </a>
+                    <a href="monthly_fees.html">
+                        <li>
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Monthly Fees</span>
+                        </li>
+                    </a>
+                    <a href="fees_report.html">
+                        <li>
+                            <i class="fas fa-chart-line"></i>
+                            <span>Fees Report</span>
+                        </li>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="settings.html">
+                        <li>
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </li>
+                    </a>
+                    <a href="change_password.html">
+                        <li>
+                            <i class="fas fa-key"></i>
+                            <span>Change Password</span>
+                        </li>
+                    </a>
+                    <a href="#" class="logout-item">
+                        <li>
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </li>
+                    </a>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Current Students</h1>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6a11cb&color=fff" alt="Profile">
+                </div>
+            </header>
+            
+            <section class="content-area">
+                <div class="data-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Active Student List</h3>
+                        <button class="btn-primary">Add New Student</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Enrollment Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#1001</td>
+                                <td>John Doe</td>
+                                <td>Violin</td>
+                                <td>2023-09-01</td>
+                                <td><span class="badge badge-paid">Active</span></td>
+                                <td><a href="#" style="color: var(--primary-color); text-decoration: none;">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>#1002</td>
+                                <td>Jane Smith</td>
+                                <td>Piano</td>
+                                <td>2023-10-15</td>
+                                <td><span class="badge badge-paid">Active</span></td>
+                                <td><a href="#" style="color: var(--primary-color); text-decoration: none;">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>#1003</td>
+                                <td>Robert Brown</td>
+                                <td>Flute</td>
+                                <td>2023-11-20</td>
+                                <td><span class="badge badge-pending">Inactive</span></td>
+                                <td><a href="#" style="color: var(--primary-color); text-decoration: none;">View</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="dashboard-script.js"></script>
+</body>
+</html>
