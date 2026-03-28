@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.textContent = originalBtnText;
                 submitBtn.disabled = false;
                 submitBtn.style.opacity = '1';
+                // Redirect to the dashboard page
+                window.location.href = '/login/index.html';
+
                 // You would normally redirect or send data to a server here
             }, 1500);
         }
