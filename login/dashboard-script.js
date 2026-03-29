@@ -15,15 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile Sidebar Toggle (Optional enhancement)
     // You could add a toggle button here for mobile views
 
-    // Submenu Toggling
-    const submenus = document.querySelectorAll('.has-submenu');
-    submenus.forEach(submenu => {
-        const trigger = submenu.querySelector('.menu-item-content');
-        trigger.addEventListener('click', () => {
-            submenu.classList.toggle('open');
-        });
+    // Submenu Toggling (Modified for dynamic content)
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('.menu-item-content');
+        if (trigger) {
+            const submenuParent = trigger.closest('.has-submenu');
+            if (submenuParent) {
+                submenuParent.classList.toggle('open');
+            }
+        }
     });
-    
 
     // Payment Modal Handling
     const modal = document.getElementById('paymentModal');
