@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submenu.classList.toggle('open');
         });
     });
+    
 
     // Payment Modal Handling
     const modal = document.getElementById('paymentModal');
