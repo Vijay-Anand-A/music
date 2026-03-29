@@ -73,6 +73,53 @@ body {
     font-size: 14px;
 }
 
+/* Submenu Styles */
+.has-submenu {
+    display: block !important;
+    padding: 0 !important;
+}
+
+.menu-item-content {
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    color: #b2bec3;
+    transition: all 0.2s ease;
+}
+
+.menu-item-content:hover {
+    background-color: var(--sidebar-hover);
+    color: white;
+}
+
+.submenu-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.has-submenu.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding-left: 15px;
+}
+
+.has-submenu.open .submenu {
+    display: block;
+}
+
+.submenu li {
+    padding: 10px 25px !important;
+    font-size: 13px !important;
+}
+
 .sidebar-menu li:hover {
     background-color: var(--sidebar-hover);
     color: white;
