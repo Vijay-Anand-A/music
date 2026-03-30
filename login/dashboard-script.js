@@ -1,15 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Session Check
+    const checkSession = () => {
+        if (!localStorage.getItem('user_session')) {
+            window.location.href = '/index.html';
+        }
+    };
+    checkSession();
+
     // Logout handling
-    const logoutLinks = document.querySelectorAll('.logout-item');
-    logoutLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (!confirm('Are you sure you want to logout?')) {
-                e.preventDefault();
-            } else {
-                alert('Logging out...');
-                // window.location.href = 'login.html';
-            }
-        });
+    const handleLogout = (e) => {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('user_session');
+            window.location.href = '/index.html';
+        }
+    };
+
+    // Logout links handling (initial and dynamic)
+    document.addEventListener('click', (e) => {
+        const logoutLink = e.target.closest('.logout-item');
+        if (logoutLink) {
+            handleLogout(e);
+        }
     });
 
     // Mobile Sidebar Toggle (Optional enhancement)

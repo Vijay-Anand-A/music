@@ -15,6 +15,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Check if already logged in
+if (localStorage.getItem('user_session')) {
+    window.location.href = 'login/pay_fees.html';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
@@ -68,7 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!querySnapshot.empty) {
                     // Successful login
                     alert('Login Successful! Welcome back.');
-                    // In a real application, you might save session info here
+                    // Save session info
+                    localStorage.setItem('user_session', 'active');
                     window.location.href = 'login/pay_fees.html'; 
                 } else {
                     // Invalid credentials
