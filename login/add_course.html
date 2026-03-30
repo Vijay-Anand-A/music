@@ -61,5 +61,44 @@
         </main>
     </div>
     <script src="dashboard-script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const courseName = document.getElementById('courseName').value;
+            const admissionFee = document.getElementById('admissionFee').value;
+            const monthlyFee = document.getElementById('monthlyFee').value;
+
+            try {
+                const docRef = await addDoc(collection(db, "course"), {
+                    courseId: docRef.id,
+                    courseName: courseName,
+                    admissionFee: Number(admissionFee),
+                    monthlyFee: Number(monthlyFee)
+                });
+                console.log("Document written with ID: ", docRef.id);
+                alert('Course added successfully!');
+                document.getElementById('addCourseForm').reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert('Error adding course. Please try again.');
+            }
+        });
+    </script>
 </body>
 </html>
