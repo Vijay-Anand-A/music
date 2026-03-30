@@ -26,7 +26,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="studentName">Name</label>
-                                        <input type="text" id="studentName" name="studentName" placeholder="Enter student name" required>
+                                        <input type="text" id="studentName" name="studentName" placeholder="Enter student name" list="studentNameList" required>
+                                        <datalist id="studentNameList"></datalist>
                                     </div>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                         <div class="form-group">
@@ -51,7 +52,7 @@
                                                 <input type="checkbox" id="monthlyFeeCheck" name="monthly" value="monthly"> Monthly Fees
                                                 <span id="monthlyFeeAmount" style="color: #ff4d4f;"></span>
                                             </label>
-                                            <select id="month" name="month" >
+                                            <select id="month" name="month" required>
                                                 <option value="">Select Month</option>
                                                 <option value="January">January</option>
                                                 <option value="February">February</option>
@@ -66,7 +67,7 @@
                                                 <option value="November">November</option>
                                                 <option value="December">December</option>
                                             </select>
-                                            <select id="year" name="year" >
+                                            <select id="year" name="year" required>
                                                 <option value="">Select Year</option>
                                                 <script>
                                                     for (let i = 2023; i <= new Date().getFullYear(); i++) {
@@ -108,16 +109,63 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const courseSelect = document.getElementById('course');
+            const studentNameInput = document.getElementById('studentName');
+            const studentNameList = document.getElementById('studentNameList');
+            const phoneNoInput = document.getElementById('phoneNo');
             const admissionFeeCheck = document.getElementById('admissionFeeCheck');
             const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
             const totalAmountInput = document.getElementById('totalAmount');
             const dateInput = document.getElementById('paymentDate');
             const receiptNoInput = document.getElementById('receiptNo');
             const paymentForm = document.getElementById('paymentForm');
-             
+            
+            let studentsData = {}; // Store student details for auto-fill
+
             if (dateInput) {
                 dateInput.valueAsDate = new Date();
             }
+
+            // Fetch and populate students for suggestions
+            async function populateStudents() {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "students"));
+                    studentNameList.innerHTML = '';
+                    querySnapshot.forEach((doc) => {
+                        const student = doc.data();
+                        const option = document.createElement('option');
+                        option.value = student.nm;
+                        studentNameList.appendChild(option);
+                        
+                        // Store student details by name for lookup
+                        studentsData[student.nm] = {
+                            mob: student.mob,
+                            course: student.course
+                        };
+                    });
+                } catch (error) {
+                    console.error("Error fetching students: ", error);
+                }
+            }
+
+            // Auto-fill phone and course when student is selected
+            studentNameInput.addEventListener('input', (e) => {
+                const name = e.target.value;
+                if (studentsData[name]) {
+                    phoneNoInput.value = studentsData[name].mob;
+                    
+                    // Select the matching course in the dropdown
+                    const courseName = studentsData[name].course;
+                    for (let i = 0; i < courseSelect.options.length; i++) {
+                        if (courseSelect.options[i].textContent === courseName) {
+                            courseSelect.selectedIndex = i;
+                            updateTotalAmount();
+                            break;
+                        }
+                    }
+                }
+            });
+
+            populateStudents();
 
             async function getNextBillNo() {
                 try {
