@@ -44,17 +44,44 @@
                                         <label>Fee Type</label>
                                         <div style="display: flex; gap: 20px; margin-top: 5px;">
                                             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 400;">
-                                                <input type="checkbox" name="admission" value="admission" checked> Admission Fees
+                                                <input type="checkbox" id="admissionFeeCheck" name="admission" value="admission" checked> Admission Fees
+                                                <span id="admissionFeeAmount" style="color: #ff4d4f;"></span>
                                             </label>
                                             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 400;">
-                                                <input type="checkbox" name="monthly" value="monthly"> Monthly Fees
+                                                <input type="checkbox" id="monthlyFeeCheck" name="monthly" value="monthly"> Monthly Fees
+                                                <span id="monthlyFeeAmount" style="color: #ff4d4f;"></span>
                                             </label>
+                                            <select id="month" name="month" >
+                                                <option value="">Select Month</option>
+                                                <option value="January">January</option>
+                                                <option value="February">February</option>
+                                                <option value="March">March</option>
+                                                <option value="April">April</option>
+                                                <option value="May">May</option>
+                                                <option value="June">June</option>
+                                                <option value="July">July</option>
+                                                <option value="August">August</option>
+                                                <option value="September">September</option>
+                                                <option value="October">October</option>
+                                                <option value="November">November</option>
+                                                <option value="December">December</option>
+                                            </select>
+                                            <select id="year" name="year" >
+                                                <option value="">Select Year</option>
+                                                <script>
+                                                    for (let i = 2023; i <= new Date().getFullYear(); i++) {
+                                                        document.write(`<option value="${i}">${i}</option>`);
+                                                    }
+                                                </script>
+                                               
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="totalAmount">Total Amount</label>
                                         <input type="number" id="totalAmount" name="totalAmount" placeholder="Enter total amount" required>
                                     </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn-secondary" onclick="window.parent.closePopup3()">Cancel</button>
@@ -81,10 +108,40 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const courseSelect = document.getElementById('course');
+            const admissionFeeCheck = document.getElementById('admissionFeeCheck');
+            const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
+            const totalAmountInput = document.getElementById('totalAmount');
             const dateInput = document.getElementById('paymentDate');
+            
             if (dateInput) {
                 dateInput.valueAsDate = new Date();
             }
+
+            function updateTotalAmount() {
+                let total = 0;
+                const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+                
+                if (selectedOption && selectedOption.value !== "") {
+                    const admissionFee = Number(selectedOption.getAttribute('data-admission')) || 0;
+                    const monthlyFee = Number(selectedOption.getAttribute('data-monthly')) || 0;
+                    
+                    if (admissionFeeCheck.checked) {
+                        total += admissionFee;
+                        document.getElementById('admissionFeeAmount').innerHTML = admissionFee.toFixed(2);
+                    }
+                    if (monthlyFeeCheck.checked) {
+                        total += monthlyFee;
+                        document.getElementById('monthlyFeeAmount').innerHTML = monthlyFee.toFixed(2);    
+                    }
+                }
+                
+                totalAmountInput.value = total;
+            }
+
+            // Event Listeners
+            courseSelect.addEventListener('change', updateTotalAmount);
+            admissionFeeCheck.addEventListener('change', updateTotalAmount);
+            monthlyFeeCheck.addEventListener('change', updateTotalAmount);
 
             async function populateCourses() {
                 console.log("Attempting to fetch courses...");
@@ -98,6 +155,9 @@
                             const option = document.createElement('option');
                             option.value = doc.id;
                             option.textContent = course.courseName;
+                            // Store fees in data attributes
+                            option.setAttribute('data-admission', course.admissionFee || 0);
+                            option.setAttribute('data-monthly', course.monthlyFee || 0);
                             courseSelect.appendChild(option);
                         });
                     }
