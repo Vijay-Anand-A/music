@@ -40,7 +40,32 @@ fetch('/login/header.html')
                 <div class="data-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3>Recent Payments</h3>
-                        <button class="btn-primary" id="openPaymentModal"  onclick="addnewpayment()">Add New Payment</button>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="month" style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
+                                <option value="all">All-month</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                            <select id="year" style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
+                                <option value="all">All-Year</option>
+                                <script> 
+                                for (let i = 2023; i <= new Date().getFullYear(); i++) {
+                                     document.write(` <option value="${i}">${i}</option>`);
+                                }    
+                                </script>
+                            </select>
+                            <button class="btn-primary" id="openPaymentModal" onclick="addnewpayment()">Add New Payment</button>
+                        </div>
                     </div>
                     
 
@@ -100,7 +125,7 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
     <script src="dashboard-script.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, where } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -115,44 +140,81 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
         const db = getFirestore(app);
 
         const paymentsTableBody = document.getElementById('paymentsTableBody');
+        const monthFilter = document.getElementById('month');
+        const yearFilter = document.getElementById('year');
 
-        // Fetch and display payments in real-time
-        const paymentsQuery = query(collection(db, "payments"), orderBy("createdAt", "desc"));
-        onSnapshot(paymentsQuery, (snapshot) => {
-            paymentsTableBody.innerHTML = '';
-            let slNo = 1;
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                
-                // Format feetype for display
-                let displayFeetype = "";
-                if (data.feetype) {
-                    const types = data.feetype.split(",");
-                    displayFeetype = types.map(t => t === "adm" ? "Admission Fee" : "Monthly Fee").join(" & ");
-                }
+        let unsubscribe = null;
 
-                const row = `
-                    <tr>
-                        <td>${slNo++}</td>
-                        <td>${data.nm || ""}</td>
-                        <td>${displayFeetype}</td>
-                        <td>Rs.${(data.adm_fee || 0).toFixed(2)}</td>
-                        <td>Rs.${(data.month_fee || 0).toFixed(2)}</td>
-                        <td>Rs.${(data.tot_amt || 0).toFixed(2)}</td>
-                        <td>${data.yr || ""}-${data.mnth || ""}</td>
-                        <td><span class="badge badge-paid">${data.status || "Paid"}</span></td>
-                        <td><button class="btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="alert('Viewing payment ID: ${doc.id}')">View</button></td>
-                    </tr>
+        function loadPayments() {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+
+            const selectedMonth = monthFilter.value;
+            const selectedYear = yearFilter.value;
+
+            // Fetch all payments ordered by date, then filter client-side
+            const q = query(collection(db, "payments"), orderBy("createdAt", "desc"));
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                paymentsTableBody.innerHTML = '';
+                let slNo = 1;
+                let totalAdm = 0;
+                let totalMonth = 0;
+                let totalAmt = 0;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Client-side Filtering
+                    const monthMatch = (selectedMonth === "all") || (data.mnth === selectedMonth);
+                    const yearMatch = (selectedYear === "all") || (data.yr === Number(selectedYear));
+
+                    if (monthMatch && yearMatch) {
+                        let displayFeetype = "";
+                        if (data.feetype) {
+                            const types = data.feetype.split(",");
+                            displayFeetype = types.map(t => t === "adm" ? "Admission Fee" : "Monthly Fee").join(" & ");
+                        }
+                        totalAdm += Number(data.adm_fee || 0);
+                        totalMonth += Number(data.month_fee || 0);
+                        totalAmt += Number(data.tot_amt || 0);
+                        const row = `
+                            <tr>
+                                <td>${slNo++}</td>
+                                <td>${data.nm || ""}</td>
+                                <td>${displayFeetype}</td>
+                                <td>Rs.${(data.adm_fee || 0).toFixed(2)}</td>
+                                <td>Rs.${(data.month_fee || 0).toFixed(2)}</td>
+                                <td>Rs.${(data.tot_amt || 0).toFixed(2)}</td>
+                                <td>${data.yr || ""}-${data.mnth || ""}</td>
+                                <td><span class="badge badge-paid">${data.status || "Paid"}</span></td>
+                                <td><button class="btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="alert('Viewing payment ID: ${doc.id}')">View</button></td>
+                            </tr>
+                           
+                        `;
+                        paymentsTableBody.innerHTML += row;
+                    }
+                });
+                paymentsTableBody.innerHTML += `
+                    <tr style="font-weight: bold;background-color: #f2f2f2;"><td colspan="3"><b>Total</b></td><td>Rs.${totalAdm.toFixed(2)}</td><td>Rs.${totalMonth.toFixed(2)}</td><td>Rs.${totalAmt.toFixed(2)}</td><td colspan="3"></td></tr>
                 `;
-                paymentsTableBody.innerHTML += row;
             });
-        });
+        }
+
+        // Event Listeners for filters
+        monthFilter.addEventListener('change', loadPayments);
+        yearFilter.addEventListener('change', loadPayments);
+
+        // Initial load
+        loadPayments();
 
         // Make closePopup3 available if needed for children
         window.closePopup3 = () => {
             document.getElementById("overlay3").style.display = "none";
             document.getElementById("popup3").style.display = "none";
             document.getElementById("popupFrame3").src = "";
+            // Reload payments after closing popup to show new data
+            loadPayments();
         };
     </script>
 </body>
