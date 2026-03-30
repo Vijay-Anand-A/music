@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Course | AV Music School</title>
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script>
+        fetch('/login/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar').innerHTML = data;
+            });
+    </script>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-music"></i>
+                <span>AV Music</span>
+            </div>
+            <div id="sidebar"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Add New Course</h1>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6a11cb&color=fff" alt="Profile">
+                </div>
+            </header>
+            
+            <section class="content-area">
+                <div class="data-card">
+                    <h3 style="margin-bottom: 20px;">Course Details</h3>
+                    <form id="addCourseForm">
+                        <div style="max-width: 500px;">
+                            <div class="form-group">
+                                <label for="courseName">Course Name</label>
+                                <input type="text" id="courseName" name="courseName" placeholder="e.g., Violin, Piano, Guitar" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="admissionFee">Admission Fee ($)</label>
+                                <input type="number" id="admissionFee" name="admissionFee" placeholder="Enter one-time admission fee" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="monthlyFee">Monthly Fee ($)</label>
+                                <input type="number" id="monthlyFee" name="monthlyFee" placeholder="Enter recurring monthly fee" required>
+                            </div>
+                            <button type="submit" class="btn-primary" style="margin-top: 10px;">Add Course</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="dashboard-script.js"></script>
+</body>
+</html>
