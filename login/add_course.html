@@ -63,7 +63,7 @@
     <script src="dashboard-script.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -85,13 +85,14 @@
             const monthlyFee = document.getElementById('monthlyFee').value;
 
             try {
-                const docRef = await addDoc(collection(db, "course"), {
-                    courseId: docRef.id,
+                const newCourseRef = doc(collection(db, "course"));
+                await setDoc(newCourseRef, {
+                    courseId: newCourseRef.id,
                     courseName: courseName,
                     admissionFee: Number(admissionFee),
                     monthlyFee: Number(monthlyFee)
                 });
-                console.log("Document written with ID: ", docRef.id);
+                console.log("Document written with ID: ", newCourseRef.id);
                 alert('Course added successfully!');
                 document.getElementById('addCourseForm').reset();
             } catch (error) {
