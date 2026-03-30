@@ -92,7 +92,7 @@
                     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -112,11 +112,37 @@
             const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
             const totalAmountInput = document.getElementById('totalAmount');
             const dateInput = document.getElementById('paymentDate');
+            const receiptNoInput = document.getElementById('receiptNo');
             const paymentForm = document.getElementById('paymentForm');
              
             if (dateInput) {
                 dateInput.valueAsDate = new Date();
             }
+
+            async function getNextBillNo() {
+                try {
+                    const q = query(collection(db, "payments"), orderBy("billno", "desc"), limit(1));
+                    const querySnapshot = await getDocs(q);
+                    let nextBillNo = 200; // Default starting number
+                    
+                    if (!querySnapshot.empty) {
+                        const lastBill = querySnapshot.docs[0].data();
+                        if (lastBill.billno) {
+                            nextBillNo = Number(lastBill.billno) + 1;
+                        }
+                    }
+                    if (receiptNoInput) {
+                        receiptNoInput.value = nextBillNo;
+                    }
+                    return nextBillNo;
+                } catch (error) {
+                    console.error("Error getting next bill number: ", error);
+                    return 200; // Fallback
+                }
+            }
+
+            // Load next bill number on open
+            getNextBillNo();
 
             function updateTotalAmount() {
                 let total = 0;
@@ -194,6 +220,7 @@
                 const feetype = feetypeArr.join(",");
 
                 try {
+                    const billNo = await getNextBillNo(); // Re-fetch to be absolutely sure we have latest
                     const newPaymentRef = doc(collection(db, "payments"));
                     const paymentData = {
                         id: newPaymentRef.id,
@@ -208,6 +235,8 @@
                         feetype: feetype,
                         status: "paid",
                         tot_amt: adm_fee + month_fee,
+                        billno: billNo,
+                        bill_date: entryDate,
                         createdAt: serverTimestamp()
                     };
 
