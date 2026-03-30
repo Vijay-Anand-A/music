@@ -15,7 +15,7 @@ const db = getFirestore(app);
 
 // create default admin (RUN ONLY ONCE)
 setDoc(doc(db, 'course', 'lists'), {
-
+  createdAt: new Date()
 })
 .then(() => {
   console.log("Course lists created in Firestore");
