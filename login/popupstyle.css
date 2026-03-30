@@ -94,7 +94,9 @@
 input[type="text"],
 input[type="date"],
 input[type="tel"],
-input[type="number"] {
+input[type="number"],
+select
+ {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #ccc;

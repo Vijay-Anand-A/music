@@ -1,11 +1,16 @@
-   <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="popupstyle.css">
-    </head>
-   <div id="paymentModal" class="modal">
-                        <div class="modal-content">
+</head>
+<body>
+   <div id="paymentModal" class="modal" style="display: block; position: static; width: 100%; height: 100%;">
+                        <div class="modal-content" style="margin: 0 auto; width: 100%; max-width: none; box-shadow: none;">
                             <div class="modal-header">
                                 <h2>New Payment</h2>
-                                <span class="close-modal">&times;</span>
+                                <span class="close-modal" onclick="window.parent.closePopup3()">&times;</span>
                             </div>
                             <form id="paymentForm">
                                 <div class="modal-body">
@@ -52,9 +57,57 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn-secondary" id="closePaymentModal">Cancel</button>
+                                    <button type="button" class="btn-secondary" onclick="window.parent.closePopup3()">Cancel</button>
                                     <button type="submit" class="btn-primary">Save Payment</button>
                                 </div>
                             </form>
                         </div>
                     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const courseSelect = document.getElementById('course');
+            const dateInput = document.getElementById('paymentDate');
+            if (dateInput) {
+                dateInput.valueAsDate = new Date();
+            }
+
+            async function populateCourses() {
+                console.log("Attempting to fetch courses...");
+                try {
+                    const querySnapshot = await getDocs(collection(db, "course"));
+                    console.log("Fetched " + querySnapshot.size + " courses");
+                    if (courseSelect) {
+                        querySnapshot.forEach((doc) => {
+                            const course = doc.data();
+                            console.log("Adding course: ", course.courseName);
+                            const option = document.createElement('option');
+                            option.value = doc.id;
+                            option.textContent = course.courseName;
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error fetching courses: ", error);
+                }
+            }
+
+            populateCourses();
+        });
+    </script>
+</body>
+</html>
