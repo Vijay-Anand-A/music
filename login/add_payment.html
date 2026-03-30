@@ -92,7 +92,7 @@
                     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -112,7 +112,8 @@
             const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
             const totalAmountInput = document.getElementById('totalAmount');
             const dateInput = document.getElementById('paymentDate');
-            
+            const paymentForm = document.getElementById('paymentForm');
+             
             if (dateInput) {
                 dateInput.valueAsDate = new Date();
             }
@@ -121,17 +122,21 @@
                 let total = 0;
                 const selectedOption = courseSelect.options[courseSelect.selectedIndex];
                 
+                // Reset amount labels
+                document.getElementById('admissionFeeAmount').innerHTML = '';
+                document.getElementById('monthlyFeeAmount').innerHTML = '';
+
                 if (selectedOption && selectedOption.value !== "") {
                     const admissionFee = Number(selectedOption.getAttribute('data-admission')) || 0;
                     const monthlyFee = Number(selectedOption.getAttribute('data-monthly')) || 0;
                     
                     if (admissionFeeCheck.checked) {
                         total += admissionFee;
-                        document.getElementById('admissionFeeAmount').innerHTML = admissionFee.toFixed(2);
+                        document.getElementById('admissionFeeAmount').innerHTML = "(" + admissionFee.toFixed(2) + ")";
                     }
                     if (monthlyFeeCheck.checked) {
                         total += monthlyFee;
-                        document.getElementById('monthlyFeeAmount').innerHTML = monthlyFee.toFixed(2);    
+                        document.getElementById('monthlyFeeAmount').innerHTML = "(" + monthlyFee.toFixed(2) + ")";    
                     }
                 }
                 
@@ -167,6 +172,57 @@
             }
 
             populateCourses();
+
+            // Handle form submission
+            paymentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const studentName = document.getElementById('studentName').value;
+                const phoneNo = document.getElementById('phoneNo').value;
+                const selectedCourseOption = courseSelect.options[courseSelect.selectedIndex];
+                const courseName = selectedCourseOption ? selectedCourseOption.textContent : "";
+                const entryDate = document.getElementById('paymentDate').value;
+                const selectedMonth = document.getElementById('month').value;
+                const yr = entryDate ? new Date(entryDate).getFullYear() : new Date().getFullYear();
+                
+                const adm_fee = admissionFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-admission')) || 0) : 0;
+                const month_fee = monthlyFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-monthly')) || 0) : 0;
+                
+                let feetypeArr = [];
+                if (admissionFeeCheck.checked) feetypeArr.push("adm");
+                if (monthlyFeeCheck.checked) feetypeArr.push("month");
+                const feetype = feetypeArr.join(",");
+
+                try {
+                    const newPaymentRef = doc(collection(db, "payments"));
+                    const paymentData = {
+                        id: newPaymentRef.id,
+                        nm: studentName,
+                        mob: phoneNo,
+                        course: courseName,
+                        entry_date: entryDate,
+                        mnth: selectedMonth,
+                        yr: yr,
+                        adm_fee: adm_fee,
+                        month_fee: month_fee,
+                        feetype: feetype,
+                        status: "paid",
+                        tot_amt: adm_fee + month_fee,
+                        createdAt: serverTimestamp()
+                    };
+
+                    await setDoc(newPaymentRef, paymentData);
+                    
+                    alert('Payment saved successfully!');
+                    paymentForm.reset();
+                    if (window.parent && window.parent.closePopup3) {
+                        window.parent.closePopup3();
+                    }
+                } catch (error) {
+                    console.error("Error saving payment: ", error);
+                    alert('Error saving payment. Please try again.');
+                }
+            });
         });
     </script>
 </body>
