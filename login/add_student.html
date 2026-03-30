@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="popupstyle.css">
+</head>
+<body>
+   <div id="paymentModal" class="modal" style="display: block; position: static; width: 100%; height: 100%;">
+                        <div class="modal-content" style="margin: 0 auto; width: 100%; max-width: none; box-shadow: none;">
+                            <div class="modal-header">
+                                <h2>New student</h2>
+                                <span class="close-modal" onclick="window.parent.closePopup3()">&times;</span>
+                            </div>
+                            <form id="paymentForm">
+                                <div class="modal-body">
+                              
+                                    <div class="form-group">
+                                        <label for="studentName">Name</label>
+                                        <input type="text" id="studentName" name="studentName" placeholder="Enter student name" required>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="phoneNo">Ph. No.</label>
+                                            <input type="tel" id="phoneNo" name="phoneNo" placeholder="Enter phone number" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="course">Course</label>
+                                            <select id="course" name="course" required>
+                                                <option value="">Select Course</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                              
+                                  
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn-secondary" onclick="window.parent.closePopup3()">Cancel</button>
+                                    <button type="submit" class="btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const courseSelect = document.getElementById('course');
+            const studentForm = document.getElementById('paymentForm');
+
+            async function populateCourses() {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "course"));
+                    if (courseSelect) {
+                        querySnapshot.forEach((doc) => {
+                            const course = doc.data();
+                            const option = document.createElement('option');
+                            option.value = course.courseName; // Use course name as value as per screenshot
+                            option.textContent = course.courseName;
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error fetching courses: ", error);
+                }
+            }
+
+            populateCourses();
+
+            // Handle form submission
+            studentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const studentName = document.getElementById('studentName').value;
+                const phoneNo = document.getElementById('phoneNo').value;
+                const courseName = courseSelect.value;
+
+                try {
+                    const newStudentRef = doc(collection(db, "students"));
+                    const studentData = {
+                        id: newStudentRef.id,
+                        nm: studentName,
+                        mob: phoneNo,
+                        course: courseName,
+                        createdAt: serverTimestamp()
+                    };
+
+                    await setDoc(newStudentRef, studentData);
+                    
+                    alert('Student added successfully!');
+                    studentForm.reset();
+                    if (window.parent && window.parent.closePopup3) {
+                        window.parent.closePopup3();
+                    }
+                } catch (error) {
+                    console.error("Error saving student: ", error);
+                    alert('Error saving student. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
