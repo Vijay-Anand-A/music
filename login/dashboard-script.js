@@ -15,6 +15,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile Sidebar Toggle (Optional enhancement)
     // You could add a toggle button here for mobile views
 
+    // Function to highlight active menu item
+    const highlightActiveMenu = () => {
+        const currentPath = window.location.pathname;
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        const links = sidebar.querySelectorAll('a');
+        links.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            const listItem = link.querySelector('li');
+            
+            if (listItem) {
+                // Check if current path ends with link path
+                if (currentPath.endsWith(linkPath)) {
+                    listItem.classList.add('active');
+                    
+                    // If it's inside a submenu, open the submenu parent
+                    const submenuParent = listItem.closest('.has-submenu');
+                    if (submenuParent) {
+                        submenuParent.classList.add('open');
+                    }
+                } else {
+                    listItem.classList.remove('active');
+                }
+            }
+        });
+    };
+
+    // Watch for sidebar content being loaded
+    const sidebarContainer = document.getElementById('sidebar');
+    if (sidebarContainer) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    highlightActiveMenu();
+                }
+            });
+        });
+
+        observer.observe(sidebarContainer, { childList: true });
+        
+        // Also try immediately in case it's already there
+        highlightActiveMenu();
+    }
+
     // Submenu Toggling (Modified for dynamic content)
     document.addEventListener('click', (e) => {
         const trigger = e.target.closest('.menu-item-content');

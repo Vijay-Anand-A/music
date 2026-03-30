@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Successful login
                     alert('Login Successful! Welcome back.');
                     // In a real application, you might save session info here
-                    window.location.href = 'login/index.html'; 
+                    window.location.href = 'login/pay_fees.html'; 
                 } else {
                     // Invalid credentials
                     passwordError.textContent = 'Invalid username or password';
