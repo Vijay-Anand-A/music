@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!querySnapshot.empty) {
                     // Successful login
-                    alert('Login Successful! Welcome back.');
+                
                     // Save session info
                     localStorage.setItem('user_session', 'active');
                     window.location.href = 'login/pay_fees.html'; 
