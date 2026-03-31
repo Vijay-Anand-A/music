@@ -191,7 +191,7 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
                                 <td>${data.yr || ""}-${data.mnth || ""}</td>
                             
                                 <td>
-                                    <i class="fas fa-receipt" style="cursor: pointer;color: #007bff;" title="View Receipt"></i> 
+                                    <i class="fas fa-receipt" style="cursor: pointer;color: #007bff;" onclick="viewReceipt('${doc.id}')" title="View Receipt"></i> 
                                     <i class="fas fa-edit" style="cursor: pointer;color: #28a745;" title="Edit Payment"></i> 
                                     <i class="fas fa-trash" style="cursor: pointer;color: #dc3545;" onclick="deletePayment('${doc.id}')" title="Delete Payment"></i></td>
                             </tr>
@@ -222,6 +222,11 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
             loadPayments();
         };
         
+        // View Receipt Function
+        window.viewReceipt = (paymentId) => {
+            window.open(`receipt.html?id=${paymentId}`, '_blank');
+        };
+
         // Delete Payment Function
         window.deletePayment = async (paymentId) => {
             // Confirm deletion

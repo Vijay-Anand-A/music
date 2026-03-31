@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt | Anandha Vruksham</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .receipt-container {
+            width: 500px;
+            border: 2px solid #000080;
+            padding: 20px;
+            border-radius: 15px;
+            color: #000080;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000080;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .cash-bill {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000080;
+            color: white;
+            padding: 2px 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+        .school-subname {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .address {
+            font-size: 12px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .info-item {
+            display: flex;
+            gap: 5px;
+        }
+        .underline {
+            border-bottom: 1px dotted #000080;
+            flex-grow: 1;
+            min-width: 50px;
+            padding: 0 5px;
+        }
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000080;
+            margin-top: 10px;
+        }
+        .main-table th, .main-table td {
+            border: 1px solid #000080;
+            padding: 10px;
+            text-align: left;
+        }
+        .fee-type-col {
+            width: 60%;
+        }
+        .amount-col {
+            width: 40%;
+            text-align: right !important;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .total-text {
+            text-align: right;
+            padding-right: 10px;
+        }
+        .rupees-word {
+            margin-top: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid #000080;
+            padding-bottom: 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .signatory {
+            text-align: right;
+            font-style: italic;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                padding: 0;
+            }
+            .receipt-container {
+                border: 2px solid #000080 !important;
+            }
+        }
+        .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #000080;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn-print no-print" onclick="window.print()">Print Receipt</button>
+    
+    <div class="receipt-container" id="receiptContent">
+        <div class="header">
+            <div class="cash-bill">CASH BILL</div>
+            <div class="school-name"><img src="../img/logo.png" alt="Anandha Vruksham" style="width: 350px;"></div>
+          
+            <div class="address">
+                No. 23-A, Stewardpet, 2nd Lane, Near KVB Bank,<br>
+                Tiruttani - 631209. Mob : 99629 99106 / 95004 95449
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-item" style="width: 40%;">
+                No. : <span class="underline" id="billNo"></span>
+            </div>
+            <div class="info-item" style="width: 50%;">
+                Date : <span class="underline" id="billDate"></span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-item" style="width: 100%;">
+                Name : <span class="underline" id="studentName"></span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-item" style="width: 50%;">
+                Ph. No. : <span class="underline" id="phoneNo"></span>
+            </div>
+            <div class="info-item" style="width: 50%;">
+                Course : <span class="underline" id="courseName"></span>
+            </div>
+        </div>
+
+        <table class="main-table">
+            <tr>
+                <td class="fee-type-col">ADMISSION FEES</td>
+                <td class="amount-col" id="admFee"></td>
+            </tr>
+            <tr>
+                <td class="fee-type-col">MONTHLY FEES</td>
+                <td class="amount-col" id="monthFee"></td>
+            </tr>
+            <tr class="total-row">
+                <td class="total-text">TOTAL</td>
+                <td class="amount-col" id="totalAmt"></td>
+            </tr>
+        </table>
+
+        <div class="rupees-word">
+            Total Rupees <span id="totalInWords" style="font-weight: bold;"></span> only
+        </div>
+
+        <div class="footer">
+            <div style="font-size: 12px;">For Anandha Vruksham</div>
+            <div class="signatory">Authorised Signatory</div>
+        </div><br>
+        <center><small><i>This is computer generated by bill</i></small></center>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to convert number to words
+        function numberToWords(num) {
+            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            if ((num = num.toString()).length > 9) return 'overflow';
+            let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return '';
+            let str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+            return str;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('id');
+
+        if (paymentId) {
+            const fetchPayment = async () => {
+                const docRef = doc(db, "payments", paymentId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('billNo').textContent = data.billno || '';
+                    document.getElementById('billDate').textContent = data.entry_date || '';
+                    document.getElementById('studentName').textContent = data.nm || '';
+                    document.getElementById('phoneNo').textContent = data.mob || '';
+                    document.getElementById('courseName').textContent = data.course || '';
+                    document.getElementById('admFee').textContent = data.adm_fee ? data.adm_fee.toFixed(2) : '0.00';
+                    document.getElementById('monthFee').textContent = data.month_fee ? data.month_fee.toFixed(2) : '0.00';
+                    const total = (data.adm_fee || 0) + (data.month_fee || 0);
+                    document.getElementById('totalAmt').textContent = total.toFixed(2);
+                    document.getElementById('totalInWords').textContent = numberToWords(total);
+
+                    // Auto-print after a short delay
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+                } else {
+                    alert("No such document!");
+                }
+            };
+            fetchPayment();
+        } else {
+            alert("No payment ID provided!");
+        }
+    </script>
+</body>
+</html>
