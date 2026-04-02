@@ -43,16 +43,16 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Fee Type</label>
-                                        <div style="display: flex; gap: 20px; margin-top: 5px;">
+                                        <div style="display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; align-items: center;">
                                             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 400;">
                                                 <input type="checkbox" id="admissionFeeCheck" name="admission" value="admission" checked> Admission Fees
-                                                <span id="admissionFeeAmount" style="color: #ff4d4f;"></span>
+                                                <input type="number" id="admissionFeeAmount" style="width: 80px; padding: 5px; border: 1px solid #dfe6e9; border-radius: 4px; margin-left: 5px;" step="0.01">
                                             </label>
                                             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 400;">
                                                 <input type="checkbox" id="monthlyFeeCheck" name="monthly" value="monthly"> Monthly Fees
-                                                <span id="monthlyFeeAmount" style="color: #ff4d4f;"></span>
+                                                <input type="number" id="monthlyFeeAmount" style="width: 80px; padding: 5px; border: 1px solid #dfe6e9; border-radius: 4px; margin-left: 5px;" step="0.01">
                                             </label>
-                                            <select id="month" name="month" required>
+                                            <select id="month" name="month" required style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
                                                 <option value="">Select Month</option>
                                                 <option value="January">January</option>
                                                 <option value="February">February</option>
@@ -67,14 +67,13 @@
                                                 <option value="November">November</option>
                                                 <option value="December">December</option>
                                             </select>
-                                            <select id="year" name="year" required>
+                                            <select id="year" name="year" required style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
                                                 <option value="">Select Year</option>
                                                 <script>
                                                     for (let i = 2023; i <= new Date().getFullYear(); i++) {
                                                         document.write(`<option value="${i}">${i}</option>`);
                                                     }
                                                 </script>
-                                               
                                             </select>
                                         </div>
                                     </div>
@@ -114,6 +113,8 @@
             const phoneNoInput = document.getElementById('phoneNo');
             const admissionFeeCheck = document.getElementById('admissionFeeCheck');
             const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
+            const admissionFeeAmountInput = document.getElementById('admissionFeeAmount');
+            const monthlyFeeAmountInput = document.getElementById('monthlyFeeAmount');
             const monthSelect = document.getElementById('month');
             const yearSelect = document.getElementById('year');
             const totalAmountInput = document.getElementById('totalAmount');
@@ -169,7 +170,7 @@
                     for (let i = 0; i < courseSelect.options.length; i++) {
                         if (courseSelect.options[i].textContent === courseName) {
                             courseSelect.selectedIndex = i;
-                            updateTotalAmount();
+                            onCourseChange(); // Populate fees when course changes
                             break;
                         }
                     }
@@ -199,35 +200,40 @@
                 }
             }
 
-            function updateTotalAmount() {
-                let total = 0;
+            function onCourseChange() {
                 const selectedOption = courseSelect.options[courseSelect.selectedIndex];
-                
-                // Reset amount labels
-                document.getElementById('admissionFeeAmount').innerHTML = '';
-                document.getElementById('monthlyFeeAmount').innerHTML = '';
-
                 if (selectedOption && selectedOption.value !== "") {
                     const admissionFee = Number(selectedOption.getAttribute('data-admission')) || 0;
                     const monthlyFee = Number(selectedOption.getAttribute('data-monthly')) || 0;
                     
-                    if (admissionFeeCheck.checked) {
-                        total += admissionFee;
-                        document.getElementById('admissionFeeAmount').innerHTML = "(" + admissionFee.toFixed(2) + ")";
-                    }
-                    if (monthlyFeeCheck.checked) {
-                        total += monthlyFee;
-                        document.getElementById('monthlyFeeAmount').innerHTML = "(" + monthlyFee.toFixed(2) + ")";    
-                    }
+                    admissionFeeAmountInput.value = admissionFee.toFixed(2);
+                    monthlyFeeAmountInput.value = monthlyFee.toFixed(2);
+                }
+                updateTotalAmount();
+            }
+
+            function updateTotalAmount() {
+                let total = 0;
+                
+                const admFee = Number(admissionFeeAmountInput.value) || 0;
+                const monFee = Number(monthlyFeeAmountInput.value) || 0;
+                
+                if (admissionFeeCheck.checked) {
+                    total += admFee;
+                }
+                if (monthlyFeeCheck.checked) {
+                    total += monFee;
                 }
                 
                 totalAmountInput.value = total;
             }
 
             // Event Listeners
-            courseSelect.addEventListener('change', updateTotalAmount);
+            courseSelect.addEventListener('change', onCourseChange);
             admissionFeeCheck.addEventListener('change', updateTotalAmount);
             monthlyFeeCheck.addEventListener('change', updateTotalAmount);
+            admissionFeeAmountInput.addEventListener('input', updateTotalAmount);
+            monthlyFeeAmountInput.addEventListener('input', updateTotalAmount);
 
             async function populateCourses() {
                 console.log("Attempting to fetch courses...");
@@ -279,6 +285,10 @@
                             }
                         }
                         
+                        // Set fee values from DB
+                        admissionFeeAmountInput.value = (data.adm_fee || 0).toFixed(2);
+                        monthlyFeeAmountInput.value = (data.month_fee || 0).toFixed(2);
+                        
                         // Set fee types
                         const feetypes = data.feetype ? data.feetype.split(',') : [];
                         admissionFeeCheck.checked = feetypes.includes('adm');
@@ -288,10 +298,6 @@
                         yearSelect.value = data.yr || '';
                         
                         updateTotalAmount();
-                        // Overwrite total amount if it was manually adjusted in DB
-                        if (data.tot_amt) {
-                            totalAmountInput.value = data.tot_amt;
-                        }
                     }
                 } catch (error) {
                     console.error("Error loading edit data:", error);
@@ -315,8 +321,8 @@
                 const selectedYear = document.getElementById('year').value;
                 const yr = selectedYear ? Number(selectedYear) : (entryDate ? new Date(entryDate).getFullYear() : new Date().getFullYear());
                 
-                const adm_fee = admissionFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-admission')) || 0) : 0;
-                const month_fee = monthlyFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-monthly')) || 0) : 0;
+                const adm_fee = admissionFeeCheck.checked ? (Number(admissionFeeAmountInput.value) || 0) : 0;
+                const month_fee = monthlyFeeCheck.checked ? (Number(monthlyFeeAmountInput.value) || 0) : 0;
                 
                 let feetypeArr = [];
                 if (admissionFeeCheck.checked) feetypeArr.push("adm");
