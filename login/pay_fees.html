@@ -178,16 +178,17 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
                         }
                         totalAdm += Number(data.adm_fee || 0);
                         totalMonth += Number(data.month_fee || 0);
-                        totalAmt += Number(data.tot_amt || 0);
+                        const currentTotAmt = Number(data.tot_amt || 0);
+                        totalAmt += currentTotAmt;
                         const row = `
                             <tr>
                                 <td>${slNo++}</td>
                                 <td>${data.nm || ""}</td>
                                 <td>${data.mob || ""}</td>
                                 <td>${displayFeetype}</td>
-                                <td>Rs.${(data.adm_fee || 0).toFixed(2)}</td>
-                                <td>Rs.${(data.month_fee || 0).toFixed(2)}</td>
-                                <td>Rs.${(data.tot_amt || 0).toFixed(2)}</td>
+                                <td>Rs.${Number(data.adm_fee || 0).toFixed(2)}</td>
+                                <td>Rs.${Number(data.month_fee || 0).toFixed(2)}</td>
+                                <td>Rs.${currentTotAmt.toFixed(2)}</td>
                                 <td>${data.yr || ""}-${data.mnth || ""}</td>
                             
                                 <td>
