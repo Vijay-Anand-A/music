@@ -253,6 +253,7 @@
                 
                 const studentName = document.getElementById('studentName').value;
                 const phoneNo = document.getElementById('phoneNo').value;
+                const totalAmountInput = document.getElementById('totalAmount').value;
                 const selectedCourseOption = courseSelect.options[courseSelect.selectedIndex];
                 const courseName = selectedCourseOption ? selectedCourseOption.textContent : "";
                 const entryDate = document.getElementById('paymentDate').value;
@@ -282,7 +283,7 @@
                         month_fee: month_fee,
                         feetype: feetype,
                         status: "paid",
-                        tot_amt: adm_fee + month_fee,
+                        tot_amt: totalAmountInput,
                         billno: billNo,
                         bill_date: entryDate,
                         createdAt: serverTimestamp()
