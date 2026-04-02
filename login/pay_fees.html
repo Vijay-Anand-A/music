@@ -193,7 +193,7 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
                             
                                 <td>
                                     <i class="fas fa-receipt" style="cursor: pointer;color: #007bff;" onclick="viewReceipt('${doc.id}')" title="View Receipt"></i> 
-                                    <i class="fas fa-edit" style="cursor: pointer;color: #28a745;" title="Edit Payment"></i> 
+                                    <i class="fas fa-edit" style="cursor: pointer;color: #28a745;" onclick="editPayment('${doc.id}')" title="Edit Payment"></i> 
                                     <i class="fas fa-trash" style="cursor: pointer;color: #dc3545;" onclick="deletePayment('${doc.id}')" title="Delete Payment"></i></td>
                             </tr>
                            
@@ -226,6 +226,17 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
         // View Receipt Function
         window.viewReceipt = (paymentId) => {
             window.open(`receipt.html?id=${paymentId}`, '_blank');
+        };
+
+        // Edit Payment Function
+        window.editPayment = (paymentId) => {
+            const overlay = document.getElementById("overlay3");
+            const popup = document.getElementById("popup3");
+            const iframe = document.getElementById("popupFrame3");
+            
+            iframe.src = `add_payment.html?id=${paymentId}`;
+            overlay.style.display = "block";
+            popup.style.display = "block";
         };
 
         // Delete Payment Function

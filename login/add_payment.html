@@ -93,7 +93,7 @@
                     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -114,6 +114,8 @@
             const phoneNoInput = document.getElementById('phoneNo');
             const admissionFeeCheck = document.getElementById('admissionFeeCheck');
             const monthlyFeeCheck = document.getElementById('monthlyFeeCheck');
+            const monthSelect = document.getElementById('month');
+            const yearSelect = document.getElementById('year');
             const totalAmountInput = document.getElementById('totalAmount');
             const dateInput = document.getElementById('paymentDate');
             const receiptNoInput = document.getElementById('receiptNo');
@@ -121,7 +123,16 @@
             
             let studentsData = {}; // Store student details for auto-fill
 
-            if (dateInput) {
+            // Check for edit ID
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('id');
+
+            if (editId) {
+                document.querySelector('.modal-header h2').textContent = "Edit Payment";
+                document.querySelector('button[type="submit"]').textContent = "Update Payment";
+            }
+
+            if (dateInput && !editId) {
                 dateInput.valueAsDate = new Date();
             }
 
@@ -165,9 +176,8 @@
                 }
             });
 
-            populateStudents();
-
             async function getNextBillNo() {
+                if (editId) return null; // Don't fetch next bill no if editing
                 try {
                     const q = query(collection(db, "payments"), orderBy("billno", "desc"), limit(1));
                     const querySnapshot = await getDocs(q);
@@ -188,9 +198,6 @@
                     return 200; // Fallback
                 }
             }
-
-            // Load next bill number on open
-            getNextBillNo();
 
             function updateTotalAmount() {
                 let total = 0;
@@ -240,11 +247,58 @@
                             courseSelect.appendChild(option);
                         });
                     }
+                    
+                    // If editing, load data after courses are populated
+                    if (editId) {
+                        loadEditData();
+                    } else {
+                        getNextBillNo();
+                    }
                 } catch (error) {
                     console.error("Error fetching courses: ", error);
                 }
             }
 
+            async function loadEditData() {
+                try {
+                    const docRef = doc(db, "payments", editId);
+                    const docSnap = await getDoc(docRef);
+                    
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        receiptNoInput.value = data.billno || '';
+                        dateInput.value = data.entry_date || '';
+                        studentNameInput.value = data.nm || '';
+                        phoneNoInput.value = data.mob || '';
+                        
+                        // Set course
+                        for (let i = 0; i < courseSelect.options.length; i++) {
+                            if (courseSelect.options[i].textContent === data.course) {
+                                courseSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        // Set fee types
+                        const feetypes = data.feetype ? data.feetype.split(',') : [];
+                        admissionFeeCheck.checked = feetypes.includes('adm');
+                        monthlyFeeCheck.checked = feetypes.includes('month');
+                        
+                        monthSelect.value = data.mnth || '';
+                        yearSelect.value = data.yr || '';
+                        
+                        updateTotalAmount();
+                        // Overwrite total amount if it was manually adjusted in DB
+                        if (data.tot_amt) {
+                            totalAmountInput.value = data.tot_amt;
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading edit data:", error);
+                }
+            }
+
+            populateStudents();
             populateCourses();
 
             // Handle form submission
@@ -253,12 +307,13 @@
                 
                 const studentName = document.getElementById('studentName').value;
                 const phoneNo = document.getElementById('phoneNo').value;
-                const totalAmountInput = document.getElementById('totalAmount').value;
+                const totalAmountVal = document.getElementById('totalAmount').value;
                 const selectedCourseOption = courseSelect.options[courseSelect.selectedIndex];
                 const courseName = selectedCourseOption ? selectedCourseOption.textContent : "";
                 const entryDate = document.getElementById('paymentDate').value;
                 const selectedMonth = document.getElementById('month').value;
-                const yr = entryDate ? new Date(entryDate).getFullYear() : new Date().getFullYear();
+                const selectedYear = document.getElementById('year').value;
+                const yr = selectedYear ? Number(selectedYear) : (entryDate ? new Date(entryDate).getFullYear() : new Date().getFullYear());
                 
                 const adm_fee = admissionFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-admission')) || 0) : 0;
                 const month_fee = monthlyFeeCheck.checked ? (Number(selectedCourseOption.getAttribute('data-monthly')) || 0) : 0;
@@ -269,10 +324,19 @@
                 const feetype = feetypeArr.join(",");
 
                 try {
-                    const billNo = await getNextBillNo(); // Re-fetch to be absolutely sure we have latest
-                    const newPaymentRef = doc(collection(db, "payments"));
+                    let billNo;
+                    let paymentRef;
+                    
+                    if (editId) {
+                        billNo = Number(receiptNoInput.value);
+                        paymentRef = doc(db, "payments", editId);
+                    } else {
+                        billNo = await getNextBillNo();
+                        paymentRef = doc(collection(db, "payments"));
+                    }
+
                     const paymentData = {
-                        id: newPaymentRef.id,
+                        id: paymentRef.id,
                         nm: studentName,
                         mob: phoneNo,
                         course: courseName,
@@ -283,15 +347,19 @@
                         month_fee: month_fee,
                         feetype: feetype,
                         status: "paid",
-                        tot_amt: Number(totalAmountInput),
+                        tot_amt: Number(totalAmountVal),
                         billno: billNo,
                         bill_date: entryDate,
-                        createdAt: serverTimestamp()
+                        updatedAt: serverTimestamp()
                     };
 
-                    await setDoc(newPaymentRef, paymentData);
+                    if (!editId) {
+                        paymentData.createdAt = serverTimestamp();
+                    }
+
+                    await setDoc(paymentRef, paymentData, { merge: true });
                     
-                    alert('Payment saved successfully!');
+                    alert(editId ? 'Payment updated successfully!' : 'Payment saved successfully!');
                     paymentForm.reset();
                     if (window.parent && window.parent.closePopup3) {
                         window.parent.closePopup3();
