@@ -13,7 +13,20 @@
         .items-container { border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
         .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 0.5fr; gap: 10px; margin-bottom: 10px; align-items: end; }
         .btn-add-item { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-bottom: 10px; }
-        .btn-remove { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+        .btn-remove { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; height: 38px; }
+        
+        /* Responsive styles */
+        .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        @media (max-width: 600px) {
+            .top-grid { grid-template-columns: 1fr; }
+            .item-row { grid-template-columns: 1fr; gap: 5px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+            .item-row:last-child { border-bottom: none; }
+            .item-row div { width: 100%; }
+            .mobile-label { display: block !important; margin-bottom: 2px; }
+            .btn-remove { width: 100%; margin-top: 5px; }
+            .modal-content { height: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -24,7 +37,7 @@
         </div>
         
         <form id="purchaseForm" style="padding: 20px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="top-grid">
                 <div class="form-group">
                     <label for="billNo">Bill No.</label>
                     <input type="text" id="billNo" readonly style="background: #f8f9fa;">
@@ -154,9 +167,18 @@
             const row = document.createElement('div');
             row.className = 'item-row';
             row.innerHTML = `
-                <div><input type="text" class="item-name" placeholder="Item Name" required></div>
-                <div><input type="number" class="item-qty" value="1" min="1" required></div>
-                <div><input type="number" class="item-price" placeholder="Price" required></div>
+                <div>
+                    <label class="mobile-label" style="font-size: 12px; display: none;">Item Name</label>
+                    <input type="text" class="item-name" placeholder="Item Name" required>
+                </div>
+                <div>
+                    <label class="mobile-label" style="font-size: 12px; display: none;">Qty</label>
+                    <input type="number" class="item-qty" value="1" min="1" required>
+                </div>
+                <div>
+                    <label class="mobile-label" style="font-size: 12px; display: none;">Price (Rs)</label>
+                    <input type="number" class="item-price" placeholder="Price" required>
+                </div>
                 <div><button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); calculateTotal();"><i class="fas fa-trash"></i></button></div>
             `;
             itemsContainer.appendChild(row);
