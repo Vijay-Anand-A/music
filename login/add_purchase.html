@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Purchase | Anandha Vruksham</title>
+    <link rel="stylesheet" href="popupstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #dfe6e9; border-radius: 6px; box-sizing: border-box; }
+        .items-container { border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
+        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 0.5fr; gap: 10px; margin-bottom: 10px; align-items: end; }
+        .btn-add-item { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-bottom: 10px; }
+        .btn-remove { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="modal-content" style="margin: 0 auto; width: 100%; box-shadow: none; height: 100vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2>New Purchase Entry</h2>
+            <span class="close-modal" onclick="window.parent.closePopup()">&times;</span>
+        </div>
+        
+        <form id="purchaseForm" style="padding: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="billNo">Bill No.</label>
+                    <input type="text" id="billNo" readonly style="background: #f8f9fa;">
+                </div>
+                <div class="form-group">
+                    <label for="purchaseDate">Date</label>
+                    <input type="date" id="purchaseDate" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" list="studentNameList" placeholder="Search or enter student name" required>
+                <datalist id="studentNameList"></datalist>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNo">Phone Number</label>
+                <input type="tel" id="phoneNo" placeholder="Phone number">
+            </div>
+
+            <label style="font-weight: bold; color: #444; margin-bottom: 5px; display: block;">Purchased Items</label>
+            <div class="items-container" id="itemsContainer">
+                <div class="item-row">
+                    <div>
+                        <label style="font-size: 12px;">Item Name</label>
+                        <input type="text" class="item-name" placeholder="e.g., Keyboard" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px;">Qty</label>
+                        <input type="number" class="item-qty" value="1" min="1" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px;">Price (Rs)</label>
+                        <input type="number" class="item-price" placeholder="Price" required>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+            <button type="button" class="btn-add-item" onclick="addItemRow()">+ Add More Item</button>
+
+            <div class="form-group">
+                <label for="totalAmount">Total Amount (Rs)</label>
+                <input type="number" id="totalAmount" value="0" readonly style="background: #f8f9fa; font-weight: bold; color: #6a11cb; font-size: 18px;">
+            </div>
+
+            <div class="modal-footer" style="padding: 20px 0;">
+                <button type="button" class="btn-secondary" onclick="window.parent.closePopup()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Purchase</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const purchaseForm = document.getElementById('purchaseForm');
+        const itemsContainer = document.getElementById('itemsContainer');
+        const totalAmountInput = document.getElementById('totalAmount');
+        const studentNameInput = document.getElementById('studentName');
+        const studentNameList = document.getElementById('studentNameList');
+        const phoneNoInput = document.getElementById('phoneNo');
+        const billNoInput = document.getElementById('billNo');
+        const dateInput = document.getElementById('purchaseDate');
+
+        let studentsData = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            dateInput.valueAsDate = new Date();
+            populateStudents();
+            getNextBillNo();
+        });
+
+        async function populateStudents() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "students"));
+                studentNameList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const student = doc.data();
+                    const option = document.createElement('option');
+                    option.value = student.nm;
+                    studentNameList.appendChild(option);
+                    studentsData[student.nm] = student.mob;
+                });
+            } catch (error) {
+                console.error("Error fetching students:", error);
+            }
+        }
+
+        studentNameInput.addEventListener('input', (e) => {
+            const name = e.target.value;
+            if (studentsData[name]) {
+                phoneNoInput.value = studentsData[name];
+            }
+        });
+
+        async function getNextBillNo() {
+            try {
+                const q = query(collection(db, "purchases"), orderBy("billNo", "desc"), limit(1));
+                const querySnapshot = await getDocs(q);
+                let nextBillNo = 500; // Purchases start from 500
+                if (!querySnapshot.empty) {
+                    const lastBill = querySnapshot.docs[0].data();
+                    if (lastBill.billNo) nextBillNo = Number(lastBill.billNo) + 1;
+                }
+                billNoInput.value = nextBillNo;
+            } catch (error) {
+                console.error("Error getting next bill number:", error);
+                billNoInput.value = 500;
+            }
+        }
+
+        window.addItemRow = () => {
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div><input type="text" class="item-name" placeholder="Item Name" required></div>
+                <div><input type="number" class="item-qty" value="1" min="1" required></div>
+                <div><input type="number" class="item-price" placeholder="Price" required></div>
+                <div><button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); calculateTotal();"><i class="fas fa-trash"></i></button></div>
+            `;
+            itemsContainer.appendChild(row);
+            addInputListeners(row);
+        };
+
+        function addInputListeners(row) {
+            const qtyInput = row.querySelector('.item-qty');
+            const priceInput = row.querySelector('.item-price');
+            qtyInput.addEventListener('input', calculateTotal);
+            priceInput.addEventListener('input', calculateTotal);
+        }
+
+        // Add listeners to initial row
+        addInputListeners(itemsContainer.querySelector('.item-row'));
+
+        function calculateTotal() {
+            let total = 0;
+            const rows = itemsContainer.querySelectorAll('.item-row');
+            rows.forEach(row => {
+                const qty = Number(row.querySelector('.item-qty').value) || 0;
+                const price = Number(row.querySelector('.item-price').value) || 0;
+                total += qty * price;
+            });
+            totalAmountInput.value = total;
+        }
+        window.calculateTotal = calculateTotal;
+
+        purchaseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const rows = itemsContainer.querySelectorAll('.item-row');
+            const items = [];
+            let itemsDescription = [];
+
+            rows.forEach(row => {
+                const name = row.querySelector('.item-name').value;
+                const qty = Number(row.querySelector('.item-qty').value);
+                const price = Number(row.querySelector('.item-price').value);
+                items.push({ name, qty, price, total: qty * price });
+                itemsDescription.push(`${name} (x${qty})`);
+            });
+
+            try {
+                const billNo = await getNextBillNo(); // Verify bill no again
+                const newPurchaseRef = doc(collection(db, "purchases"));
+                const purchaseData = {
+                    id: newPurchaseRef.id,
+                    billNo: Number(billNoInput.value),
+                    date: dateInput.value,
+                    studentName: studentNameInput.value,
+                    phoneNo: phoneNoInput.value,
+                    items: items,
+                    itemsDescription: itemsDescription.join(", "),
+                    totalAmount: Number(totalAmountInput.value),
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(newPurchaseRef, purchaseData);
+                alert('Purchase saved successfully!');
+                window.parent.closePopup();
+            } catch (error) {
+                console.error("Error saving purchase:", error);
+                alert('Error saving purchase. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

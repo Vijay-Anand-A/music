@@ -1,2 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Bill | Anandha Vruksham</title>
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .badge-paid { background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .btn-primary { background: #6a11cb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-music"></i>
+                <span>AV Music</span>
+            </div>
+            <div id="sidebar"></div>
+        </aside>
 
-On process
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Purchase Bill Management</h1>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6a11cb&color=fff" alt="Profile">
+                </div>
+            </header>
+            
+            <section class="content-area">
+                <div class="data-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Recent Purchases</h3>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="monthFilter" style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
+                                <option value="all">All Months</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                            <select id="yearFilter" style="padding: 8px; border-radius: 6px; border: 1px solid #dfe6e9;">
+                                <option value="all">All Years</option>
+                                <script>
+                                    for (let i = 2023; i <= new Date().getFullYear(); i++) {
+                                        document.write(`<option value="${i}">${i}</option>`);
+                                    }
+                                </script>
+                            </select>
+                            <button class="btn-primary" onclick="openAddPurchase()">Add New Purchase</button>
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sl. No</th>
+                                <th>Bill No</th>
+                                <th>Student Name</th>
+                                <th>Item(s)</th>
+                                <th>Total Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchaseTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index:999;"></div>
+    
+    <!-- Popup Modal -->
+    <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; max-width:600px; height:80vh; background:white; border-radius:12px; z-index:1000; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+        <iframe id="popupFrame" src="" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <script src="dashboard-script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const purchaseTableBody = document.getElementById('purchaseTableBody');
+        const monthFilter = document.getElementById('monthFilter');
+        const yearFilter = document.getElementById('yearFilter');
+
+        let unsubscribe = null;
+
+        function loadPurchases() {
+            if (unsubscribe) unsubscribe();
+
+            const selectedMonth = monthFilter.value;
+            const selectedYear = yearFilter.value;
+
+            const q = query(collection(db, "purchases"), orderBy("createdAt", "desc"));
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                purchaseTableBody.innerHTML = '';
+                let slNo = 1;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Client-side filtering
+                    const dateObj = new Date(data.date);
+                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    const dataMonth = monthNames[dateObj.getMonth()];
+                    const dataYear = dateObj.getFullYear();
+
+                    const monthMatch = (selectedMonth === "all") || (dataMonth === selectedMonth);
+                    const yearMatch = (selectedYear === "all") || (dataYear.toString() === selectedYear);
+
+                    if (monthMatch && yearMatch) {
+                        const row = `
+                            <tr>
+                                <td>${slNo++}</td>
+                                <td>${data.billNo || ""}</td>
+                                <td>${data.studentName || ""}</td>
+                                <td>${data.itemsDescription || ""}</td>
+                                <td>Rs.${(data.totalAmount || 0).toFixed(2)}</td>
+                                <td>${data.date || ""}</td>
+                                <td><span class="badge-paid">Paid</span></td>
+                                <td>
+                                    <i class="fas fa-receipt" style="cursor:pointer; color:#007bff; margin-right:10px;" title="Print" onclick="printPurchase('${doc.id}')"></i>
+                                    <i class="fas fa-trash" style="cursor:pointer; color:#dc3545;" title="Delete" onclick="deletePurchase('${doc.id}')"></i>
+                                </td>
+                            </tr>
+                        `;
+                        purchaseTableBody.innerHTML += row;
+                    }
+                });
+            });
+        }
+
+        window.openAddPurchase = () => {
+            const overlay = document.getElementById('overlay');
+            const popup = document.getElementById('popup');
+            const iframe = document.getElementById('popupFrame');
+            iframe.src = 'add_purchase.html';
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+        };
+
+        window.closePopup = () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('popupFrame').src = '';
+            loadPurchases();
+        };
+
+        window.deletePurchase = async (id) => {
+            if (confirm("Are you sure you want to delete this purchase record?")) {
+                try {
+                    await deleteDoc(doc(db, "purchases", id));
+                    alert("Record deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting record:", error);
+                    alert("Error deleting record.");
+                }
+            }
+        };
+
+        window.printPurchase = (id) => {
+            window.open(`purchase_receipt.html?id=${id}`, '_blank');
+        };
+
+        monthFilter.addEventListener('change', loadPurchases);
+        yearFilter.addEventListener('change', loadPurchases);
+
+        loadPurchases();
+    </script>
+</body>
+</html>
