@@ -90,11 +90,16 @@ fetch('/login/header.html')
                                 <td>${data.mob}</td>
                                 <td>${data.course}</td>
                                 <td><i class="fas fa-trash" onclick="deleteStudent('${doc.id}')" style="color:red;cursor:pointer;"></i></td>
-                                <td><i class="fas fa-plus"></i> &nbsp; <i class="fas fa-print"></i></td>
+                                <td><i class="fas fa-plus" style="cursor:pointer;color:#6a11cb;" title="Add Detail"></i> &nbsp; 
+                                    <i class="fas fa-print" onclick="printApplication('${doc.id}')" style="cursor:pointer;color:#006400;" title="Print Application"></i></td>
                             `;
                             studentList.appendChild(row);
                         });
                     });
+
+               window.printApplication = (studentId) => {
+                   window.open(`student_application.html?id=${studentId}`, '_blank');
+               };
 
                window.deleteStudent = async (studentId) => {
             // Confirm deletion
