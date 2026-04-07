@@ -166,9 +166,9 @@
                         // Populate Gender
                         if (data.gender) {
                             if (data.gender.toLowerCase() === 'male') {
-                                document.getElementById('gender_male').textContent = '<i class="fas fa-mars"></i>';
+                                document.getElementById('gender_male').innerHTML = '&#10003;'; // Unicode tick mark
                             } else if (data.gender.toLowerCase() === 'female') {
-                                document.getElementById('gender_female').textContent = '<i class="fas fa-female"></i>';
+                                document.getElementById('gender_female').innerHTML = '&#10003;'; // Unicode tick mark
                             }
                         }
 
