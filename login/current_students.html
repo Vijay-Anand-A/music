@@ -90,7 +90,7 @@ fetch('/login/header.html')
                                 <td>${data.mob}</td>
                                 <td>${data.course}</td>
                                 <td><i class="fas fa-trash" onclick="deleteStudent('${doc.id}')" style="color:red;cursor:pointer;"></i></td>
-                                <td><i class="fas fa-plus" style="cursor:pointer;color:#6a11cb;" title="Add Detail"></i> &nbsp; 
+                                <td><i class="fas fa-plus" onclick="editStudent('${doc.id}')" style="cursor:pointer;color:#6a11cb;" title="Add Detail"></i> &nbsp; 
                                     <i class="fas fa-print" onclick="printApplication('${doc.id}')" style="cursor:pointer;color:#006400;" title="Print Application"></i></td>
                             `;
                             studentList.appendChild(row);
@@ -132,6 +132,12 @@ background:rgba(0,0,0,0.5); backdrop-filter: blur(3px);z-index:999;">
 			document.getElementById("overlay3").style.display = "block";
 			document.getElementById("popup3").style.display = "block";
 			document.getElementById("popupFrame3").src = "add_student.html";    
+		}
+
+		function editStudent(id) {
+			document.getElementById("overlay3").style.display = "block";
+			document.getElementById("popup3").style.display = "block";
+			document.getElementById("popupFrame3").src = "add_student.html?id=" + id;    
 		}
 
 		function closePopup3() {

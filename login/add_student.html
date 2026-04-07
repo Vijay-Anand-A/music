@@ -13,12 +13,34 @@
                                 <span class="close-modal" onclick="window.parent.closePopup3()">&times;</span>
                             </div>
                             <form id="paymentForm">
-                                <div class="modal-body">
-                              
-                                    <div class="form-group">
-                                        <label for="studentName">Name</label>
-                                        <input type="text" id="studentName" name="studentName" placeholder="Enter student name" required>
+                                <div class="modal-body" style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                                    
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="admissionNo">Admission No.</label>
+                                            <input type="text" id="admissionNo" name="admissionNo" placeholder="Enter admission number">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="studentName">Student Name</label>
+                                            <input type="text" id="studentName" name="studentName" placeholder="Enter student name" required>
+                                        </div>
                                     </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="dob">Date of Birth</label>
+                                            <input type="date" id="dob" name="dob">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="gender">Gender</label>
+                                            <select id="gender" name="gender">
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                         <div class="form-group">
                                             <label for="phoneNo">Ph. No.</label>
@@ -31,8 +53,55 @@
                                             </select>
                                         </div>
                                     </div>
-                              
-                                  
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="fatherName">Father's Name</label>
+                                            <input type="text" id="fatherName" name="fatherName" placeholder="Enter father's name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="motherName">Mother's Name</label>
+                                            <input type="text" id="motherName" name="motherName" placeholder="Enter mother's name">
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="guardianName">Guardian Name</label>
+                                            <input type="text" id="guardianName" name="guardianName" placeholder="Enter guardian name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="emailId">Email ID</label>
+                                            <input type="email" id="emailId" name="emailId" placeholder="Enter email address">
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="aadhar">Aadhar Number</label>
+                                            <input type="text" id="aadhar" name="aadhar" placeholder="Enter 12-digit Aadhar" maxlength="12">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="reference">Reference</label>
+                                            <input type="text" id="reference" name="reference" placeholder="Enter reference">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="permanentAddress">Permanent Address</label>
+                                        <textarea id="permanentAddress" name="permanentAddress" placeholder="Enter permanent address" rows="2" style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 8px;"></textarea>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="place">Place</label>
+                                            <input type="text" id="place" name="place" placeholder="Enter place">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="regDate">Registration Date</label>
+                                            <input type="date" id="regDate" name="regDate">
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div class="modal-footer">
@@ -44,7 +113,7 @@
                     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -58,9 +127,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const courseSelect = document.getElementById('course');
             const studentForm = document.getElementById('paymentForm');
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            const modalTitle = document.querySelector('.modal-header h2');
+            const saveBtn = document.querySelector('.btn-primary');
 
             async function populateCourses() {
                 try {
@@ -79,7 +152,48 @@
                 }
             }
 
-            populateCourses();
+            await populateCourses();
+
+            if (studentId) {
+                modalTitle.textContent = "Edit student";
+                saveBtn.textContent = "Update";
+                
+                try {
+                    const studentDoc = await getDoc(doc(db, "students", studentId));
+                    if (studentDoc.exists()) {
+                        const data = studentDoc.data();
+                        document.getElementById('admissionNo').value = data.adm_no || '';
+                        document.getElementById('studentName').value = data.nm || '';
+                        document.getElementById('phoneNo').value = data.mob || '';
+                        courseSelect.value = data.course || '';
+                        document.getElementById('gender').value = data.gender || '';
+                        document.getElementById('fatherName').value = data.fath_nm || '';
+                        document.getElementById('motherName').value = data.moth_nm || '';
+                        document.getElementById('guardianName').value = data.parent_nm || '';
+                        document.getElementById('emailId').value = data.email || '';
+                        document.getElementById('aadhar').value = data.aadhar || '';
+                        document.getElementById('reference').value = data.refer || '';
+                        document.getElementById('permanentAddress').value = data.addr || '';
+                        document.getElementById('place').value = data.place || '';
+
+                        // Handle Date of Birth
+                        if (data.dob && data.dob.toDate) {
+                            const dobDate = data.dob.toDate();
+                            document.getElementById('dob').value = dobDate.toISOString().split('T')[0];
+                        }
+
+                        // Handle Registration Date
+                        if (data.reg_dt && data.reg_dt.toDate) {
+                            const regDate = data.reg_dt.toDate();
+                            document.getElementById('regDate').value = regDate.toISOString().split('T')[0];
+                        }
+                    } else {
+                        alert("Student not found");
+                    }
+                } catch (error) {
+                    console.error("Error fetching student details: ", error);
+                }
+            }
 
             // Handle form submission
             studentForm.addEventListener('submit', async (e) => {
@@ -88,20 +202,54 @@
                 const studentName = document.getElementById('studentName').value;
                 const phoneNo = document.getElementById('phoneNo').value;
                 const courseName = courseSelect.value;
+                const admissionNo = document.getElementById('admissionNo').value;
+                const gender = document.getElementById('gender').value;
+                const fatherName = document.getElementById('fatherName').value;
+                const motherName = document.getElementById('motherName').value;
+                const guardianName = document.getElementById('guardianName').value;
+                const emailId = document.getElementById('emailId').value;
+                const aadhar = document.getElementById('aadhar').value;
+                const reference = document.getElementById('reference').value;
+                const permanentAddress = document.getElementById('permanentAddress').value;
+                const place = document.getElementById('place').value;
+                const dobVal = document.getElementById('dob').value;
+                 const regDateVal = document.getElementById('regDate').value;
+
+                 const studentData = {
+                    adm_no: admissionNo,
+                    nm: studentName,
+                    mob: phoneNo,
+                    course: courseName,
+                    gender: gender,
+                    fath_nm: fatherName,
+                    moth_nm: motherName,
+                    parent_nm: guardianName,
+                    email: emailId,
+                    aadhar: aadhar,
+                    refer: reference,
+                    addr: permanentAddress,
+                    place: place,
+                };
+
+                if (dobVal) studentData.dob = Timestamp.fromDate(new Date(dobVal));
+                if (regDateVal) studentData.reg_dt = Timestamp.fromDate(new Date(regDateVal));
 
                 try {
-                    const newStudentRef = doc(collection(db, "students"));
-                    const studentData = {
-                        id: newStudentRef.id,
-                        nm: studentName,
-                        mob: phoneNo,
-                        course: courseName,
-                        createdAt: serverTimestamp()
-                    };
-
-                    await setDoc(newStudentRef, studentData);
+                    if (studentId) {
+                        // Update existing student
+                        const studentRef = doc(db, "students", studentId);
+                        studentData.updatedAt = serverTimestamp();
+                        await updateDoc(studentRef, studentData);
+                        alert('Student updated successfully!');
+                    } else {
+                        // Create new student
+                        const newStudentRef = doc(collection(db, "students"));
+                        studentData.id = newStudentRef.id;
+                        studentData.createdAt = serverTimestamp();
+                        await setDoc(newStudentRef, studentData);
+                        alert('Student added successfully!');
+                    }
                     
-                    alert('Student added successfully!');
                     studentForm.reset();
                     if (window.parent && window.parent.closePopup3) {
                         window.parent.closePopup3();
