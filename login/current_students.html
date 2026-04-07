@@ -50,6 +50,7 @@ fetch('/login/header.html')
                                 <th>Contact</th>
                                 <th>Course</th>
                                 <th>Action</th>
+                                <th>Application</th>
                             </tr>
                         </thead>
                         <tbody id="studentList">
@@ -88,6 +89,7 @@ fetch('/login/header.html')
                                 <td>${data.nm}</td>
                                 <td>${data.mob}</td>
                                 <td>${data.course}</td>
+                                <td><i class="fas fa-plus"></i> &nbsp; <i class="fas fa-print"></i></td>
                                 <td><i class="fas fa-trash" onclick="deleteStudent('${doc.id}')" style="color:red;cursor:pointer;"></i></td>
                             `;
                             studentList.appendChild(row);
