@@ -5,141 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Application Form | Anandha Vruksham</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            background-color: #f0f0f0;
-        }
-        .application-container {
-            width: 210mm; /* A4 width */
-            background: white;
-            padding: 30px;
-            box-sizing: border-box;
-            border: 2px solid #006400;
-            position: relative;
-            color: #006400;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header img {
-            width: 400px;
-            margin-bottom: 10px;
-        }
-        .header-info {
-            font-size: 12px;
-            line-height: 1.4;
-            border-bottom: 2px solid #8b0000;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .form-title {
-            background-color: #8b0000;
-            color: white;
-            display: inline-block;
-            padding: 5px 20px;
-            font-weight: bold;
-            font-size: 18px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .form-row {
-            display: flex;
-            align-items: flex-end;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-        .label {
-            font-weight: bold;
-            width: 150px;
-            flex-shrink: 0;
-        }
-        .underline-box {
-            border: 1px solid #006400;
-            height: 30px;
-            flex-grow: 1;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-        }
-        .dob-boxes {
-            display: flex;
-            gap: 2px;
-        }
-        .box {
-            border: 1px solid #006400;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .photo-box {
-            position: absolute;
-            top: 180px;
-            right: 30px;
-            width: 100px;
-            height: 120px;
-            border: 1px solid #006400;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .address-box {
-            border: 1px solid #006400;
-            width: 100%;
-            height: 100px;
-            margin-top: 5px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        .declaration {
-            font-style: italic;
-            font-size: 12px;
-            margin-top: 30px;
-            margin-bottom: 40px;
-        }
-        .footer-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .signature-area {
-            text-align: right;
-        }
-        .aadhar-boxes {
-            display: flex;
-            gap: 2px;
-        }
-        @media print {
-            body { background-color: white; padding: 0; }
-            .application-container { border: 2px solid #006400 !important; width: 100%; }
-            .no-print { display: none; }
-        }
-        .btn-print {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #006400;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 1001;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; background-color: #f0f0f0; }
+        .application-container { width: 210mm; background: white; padding: 30px; box-sizing: border-box; border: 2px solid #006400; position: relative; color: #006400; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header img { width: 400px; margin-bottom: 10px; }
+        .header-info { font-size: 12px; line-height: 1.4; border-bottom: 2px solid #8b0000; padding-bottom: 10px; margin-bottom: 10px; }
+        .form-title { background-color: #8b0000; color: white; display: inline-block; padding: 5px 20px; font-weight: bold; font-size: 18px; border-radius: 5px; margin-bottom: 20px; }
+        .form-row { display: flex; align-items: flex-end; margin-bottom: 15px; gap: 10px; }
+        .label { font-weight: bold; width: 150px; flex-shrink: 0; }
+        .underline-box { border: 1px solid #006400; height: 30px; flex-grow: 1; padding: 0 10px; display: flex; align-items: center; font-size: 14px; }
+        .dob-boxes, .aadhar-boxes { display: flex; gap: 2px; }
+        .box { border: 1px solid #006400; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
+        .photo-box { position: absolute; top: 180px; right: 30px; width: 100px; height: 120px; border: 1px solid #006400; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .address-box { border: 1px solid #006400; width: 100%; min-height: 80px; margin-top: 5px; padding: 10px; box-sizing: border-box; }
+        .declaration { font-style: italic; font-size: 12px; margin-top: 30px; margin-bottom: 40px; }
+        .footer-row { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; }
+        @media print { body { background-color: white; padding: 0; } .application-container { border: 2px solid #006400 !important; width: 100%; } .no-print { display: none; } }
+        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #006400; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 1001; }
     </style>
 </head>
 <body>
     <button class="btn-print no-print" onclick="window.print()">Print Application</button>
-
     <div class="application-container">
         <div class="header">
             <img src="../img/logo.png" alt="Anandha Vruksham Logo">
@@ -149,97 +35,69 @@
             </div>
             <div class="form-title">APPLICATION FORM</div>
         </div>
-
         <div class="photo-box">PHOTO</div>
-
         <div class="form-row">
             <div class="label">Admission No.</div>
             <div class="underline-box" style="width: 250px; flex-grow: 0;" id="admissionNo"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Student's Name</div>
             <div class="underline-box" id="studentName"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Date of Birth</div>
-            <div class="dob-boxes">
-                <div class="box"></div><div class="box"></div>
-                <div style="margin: 0 5px;"></div>
-                <div class="box"></div><div class="box"></div>
-                <div style="margin: 0 5px;"></div>
-                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
-            </div>
+            <div class="dob-boxes" id="dob-container"></div>
             <div style="margin-left: 20px; font-weight: bold;">Sex</div>
-            <div class="box"></div> <span style="font-size: 12px; margin-right: 10px;">MALE</span>
-            <div class="box"></div> <span style="font-size: 12px;">FEMALE</span>
+            <div class="box" id="gender_male"></div> <span style="font-size: 12px; margin-right: 10px;">MALE</span>
+            <div class="box" id="gender_female"></div> <span style="font-size: 12px;">FEMALE</span>
         </div>
-
         <div class="form-row">
             <div class="label">Courses</div>
             <div class="underline-box" id="courseName"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Father's Name</div>
-            <div class="underline-box"></div>
+            <div class="underline-box" id="fatherName"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Mother's Name</div>
-            <div class="underline-box"></div>
+            <div class="underline-box" id="motherName"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Guardian</div>
-            <div class="underline-box"></div>
+            <div class="underline-box" id="guardianName"></div>
         </div>
-
         <div class="form-row">
             <div class="label">E-mail Id</div>
-            <div class="underline-box"></div>
+            <div class="underline-box" id="emailId"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Aadhar Number</div>
-            <div class="aadhar-boxes">
-                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
-                <div style="margin: 0 2px;"></div>
-                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
-                <div style="margin: 0 2px;"></div>
-                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
-            </div>
+            <div class="aadhar-boxes" id="aadhar-container"></div>
         </div>
-
         <div class="form-row">
             <div class="label">Reference</div>
-            <div class="underline-box"></div>
+            <div class="underline-box" id="reference"></div>
         </div>
-
         <div style="margin-top: 15px;">
             <div class="label">Permanent Address</div>
-            <div class="address-box"></div>
+            <div class="address-box" id="permanentAddress"></div>
         </div>
-
         <div class="form-row" style="margin-top: 20px;">
             <div class="label">CONTACT :</div>
             <div class="underline-box" id="phoneNo"></div>
         </div>
-
         <div class="declaration">
             I hereby confirm that above mentioned statement is true to the best of my knowledge.<br>
             I hereby certify that I will obey all the rules & regulations of the institute.
         </div>
-
         <div class="footer-row">
-            <div>Date : ...........................</div>
-            <div class="signature-area">Signature of Candidate</div>
+            <div>Date : <span id="registrationDate" style="text-decoration: underline dotted;"></span></div>
+            <div style="text-align: right;">Signature of Candidate</div>
         </div>
-
         <div class="footer-row" style="margin-top: 30px;">
-            <div>Place : ..........................</div>
-            <div class="signature-area">PARENT / GUARDIAN</div>
+            <div>Place : <span id="place" style="text-decoration: underline dotted;"></span></div>
+            <div style="text-align: right;">PARENT / GUARDIAN</div>
         </div>
     </div>
 
@@ -270,11 +128,71 @@
 
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+                        
+                        // Populate simple fields
+                        document.getElementById('admissionNo').textContent = data.adm_no || '';
                         document.getElementById('studentName').textContent = data.nm || '';
-                        document.getElementById('phoneNo').textContent = data.mob || '';
                         document.getElementById('courseName').textContent = data.course || '';
-                        // Assuming id might be used as admission no for now
-                        document.getElementById('admissionNo').textContent = data.id || '';
+                        document.getElementById('fatherName').textContent = data.fath_nm || '';
+                        document.getElementById('motherName').textContent = data.moth_nm || '';
+                        document.getElementById('guardianName').textContent = data.parent_nm || '';
+                        document.getElementById('emailId').textContent = data.email || '';
+                        document.getElementById('reference').textContent = data.refer || '';
+                        document.getElementById('permanentAddress').textContent = data.addr || '';
+                        document.getElementById('phoneNo').textContent = data.mob || '';
+                        document.getElementById('place').textContent = data.place || '....................';
+
+                        // Populate Date of Birth
+                        if (data.dob && data.dob.toDate) {
+                            const dob = data.dob.toDate();
+                            const day = String(dob.getDate()).padStart(2, '0');
+                            const month = String(dob.getMonth() + 1).padStart(2, '0');
+                            const year = dob.getFullYear();
+                            const dobString = `${day}${month}${year}`;
+                            const dobContainer = document.getElementById('dob-container');
+                            dobString.split('').forEach((char, index) => {
+                                const box = document.createElement('div');
+                                box.className = 'box';
+                                box.textContent = char;
+                                dobContainer.appendChild(box);
+                                if (index === 1 || index === 3) {
+                                    const separator = document.createElement('div');
+                                    separator.style.margin = '0 5px';
+                                    dobContainer.appendChild(separator);
+                                }
+                            });
+                        }
+
+                        // Populate Gender
+                        if (data.gender) {
+                            if (data.gender.toLowerCase() === 'male') {
+                                document.getElementById('gender_male').textContent = 'X';
+                            } else if (data.gender.toLowerCase() === 'female') {
+                                document.getElementById('gender_female').textContent = 'X';
+                            }
+                        }
+
+                        // Populate Aadhar
+                        if (data.aadhar) {
+                            const aadharContainer = document.getElementById('aadhar-container');
+                            data.aadhar.toString().split('').forEach((char, index) => {
+                                const box = document.createElement('div');
+                                box.className = 'box';
+                                box.textContent = char;
+                                aadharContainer.appendChild(box);
+                                if ((index + 1) % 4 === 0 && index < 11) {
+                                    const separator = document.createElement('div');
+                                    separator.style.margin = '0 2px';
+                                    aadharContainer.appendChild(separator);
+                                }
+                            });
+                        }
+
+                        // Populate Registration Date
+                        if (data.reg_dt && data.reg_dt.toDate) {
+                            const regDate = data.reg_dt.toDate();
+                            document.getElementById('registrationDate').textContent = regDate.toLocaleDateString('en-GB');
+                        }
 
                         // Auto-print after data is loaded
                         setTimeout(() => {
