@@ -13,11 +13,11 @@
         .form-title { background-color: #8b0000; color: white; display: inline-block; padding: 5px 20px; font-weight: bold; font-size: 18px; border-radius: 5px; margin-bottom: 20px; }
         .form-row { display: flex; align-items: flex-end; margin-bottom: 15px; gap: 10px; }
         .label { font-weight: bold; width: 150px; flex-shrink: 0; }
-        .underline-box { border: 1px solid #006400; height: 30px; flex-grow: 1; padding: 0 10px; display: flex; align-items: center; font-size: 14px; }
+        .underline-box { color:#000;border: 1px solid #006400; height: 30px; flex-grow: 1; padding: 0 10px; display: flex; align-items: center; font-size: 14px; }
         .dob-boxes, .aadhar-boxes { display: flex; gap: 2px; }
-        .box { border: 1px solid #006400; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
+        .box { color:#000;border: 1px solid #006400; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
         .photo-box { position: absolute; top: 180px; right: 30px; width: 100px; height: 120px; border: 1px solid #006400; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-        .address-box { border: 1px solid #006400; width: 100%; min-height: 80px; margin-top: 5px; padding: 10px; box-sizing: border-box; }
+        .address-box { color:#000;border: 1px solid #006400; width: 100%; min-height: 80px; margin-top: 5px; padding: 10px; box-sizing: border-box; }
         .declaration { font-style: italic; font-size: 12px; margin-top: 30px; margin-bottom: 40px; }
         .footer-row { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; }
         @media print { body { background-color: white; padding: 0; } .application-container { border: 2px solid #006400 !important; width: 100%; } .no-print { display: none; } }
@@ -47,7 +47,7 @@
         <div class="form-row">
             <div class="label">Date of Birth</div>
             <div class="dob-boxes" id="dob-container"></div>
-            <div style="margin-left: 20px; font-weight: bold;">Sex</div>
+            <div style="margin-left: 20px; font-weight: bold;">Gender</div>
             <div class="box" id="gender_male"></div> <span style="font-size: 12px; margin-right: 10px;">MALE</span>
             <div class="box" id="gender_female"></div> <span style="font-size: 12px;">FEMALE</span>
         </div>
@@ -92,11 +92,11 @@
             I hereby certify that I will obey all the rules & regulations of the institute.
         </div>
         <div class="footer-row">
-            <div>Date : <span id="registrationDate" style="text-decoration: underline dotted;"></span></div>
+            <div>Date : <span id="registrationDate" style="text-decoration: underline dotted;color:#000;"></span></div>
             <div style="text-align: right;">Signature of Candidate</div>
         </div>
         <div class="footer-row" style="margin-top: 30px;">
-            <div>Place : <span id="place" style="text-decoration: underline dotted;"></span></div>
+            <div>Place : <span id="place" style="text-decoration: underline dotted;color:#000;"></span></div>
             <div style="text-align: right;">PARENT / GUARDIAN</div>
         </div>
     </div>
