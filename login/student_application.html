@@ -35,7 +35,7 @@
             </div>
             <div class="form-title">APPLICATION FORM</div>
         </div>
-        <div class="photo-box">PHOTO</div>
+        <div class="photo-box" id="studentPhotoContainer">PHOTO</div>
         <div class="form-row">
             <div class="label">Admission No.</div>
             <div class="underline-box" style="width: 250px; flex-grow: 0;" id="admissionNo"></div>
@@ -141,6 +141,12 @@
                         document.getElementById('permanentAddress').textContent = data.addr || '';
                         document.getElementById('phoneNo').textContent = data.mob || '';
                         document.getElementById('place').textContent = data.place || '....................';
+
+                        // Populate Photo
+                        if (data.pic) {
+                            const photoContainer = document.getElementById('studentPhotoContainer');
+                            photoContainer.innerHTML = `<img src="${data.pic}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        }
 
                         // Populate Date of Birth
                         if (data.dob && data.dob.toDate) {
