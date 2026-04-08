@@ -13,7 +13,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 async function exportData() {
-    const collections = ["course", "students", "payments", "login"]; // your collections
+    const collections = ["course", "students", "payments", "login" ,"purchases"]; // your collections
     let exportData = {};
 
     for (let col of collections) {
