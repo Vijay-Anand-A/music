@@ -60,24 +60,7 @@ fetch('/login/header.html')
                     </div>
                 </div>
 
-                <div class="data-card">
-                    <h3>Fee Collection History</h3>
-                    <table class="data-table" style="margin-top: 20px;">
-                        <thead>
-                            <tr>
-                                <th>Bill No</th>
-                                <th>Student Name</th>
-                                <th>Date</th>
-                                <th>Adm. Fee</th>
-                                <th>Month Fee</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="feesTableBody">
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
+              
             </section>
         </main>
     </div>
@@ -140,16 +123,7 @@ fetch('/login/header.html')
 
                 // Add to table
                 const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'N/A';
-                const row = `
-                    <tr>
-                        <td>${data.billNo || 'N/A'}</td>
-                        <td>${data.nm || 'N/A'}</td>
-                        <td>${date}</td>
-                        <td>₹${adm.toFixed(2)}</td>
-                        <td>₹${month.toFixed(2)}</td>
-                        <td>₹${total.toFixed(2)}</td>
-                    </tr>
-                `;
+              
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
 
