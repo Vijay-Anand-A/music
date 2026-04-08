@@ -59,8 +59,6 @@ fetch('/login/header.html')
                         <h2 id="totalMonthlyFees" style="color: #f1c40f;">₹0.00</h2>
                     </div>
                 </div>
-
-               
             </section>
         </main>
     </div>
@@ -108,8 +106,6 @@ fetch('/login/header.html')
             let totalColl = 0;
             let totalAdm = 0;
             let totalMonth = 0;
-            const tableBody = document.getElementById('feesTableBody');
-            tableBody.innerHTML = '';
 
             snapshot.forEach(doc => {
                 const data = doc.data();
@@ -120,15 +116,6 @@ fetch('/login/header.html')
                 totalColl += total;
                 totalAdm += adm;
                 totalMonth += month;
-
-                // Add to table
-                const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'N/A';
-                const row = `
-                        ${adm.toFixed(2)}
-                       ${month.toFixed(2)}
-                       ${total.toFixed(2)}
-                    `;
-                tableBody.insertAdjacentHTML('beforeend', row);
             });
 
             document.getElementById('totalCollection').textContent = `₹${totalColl.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
