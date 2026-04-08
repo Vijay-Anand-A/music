@@ -60,7 +60,7 @@ fetch('/login/header.html')
                     </div>
                 </div>
 
-              
+               
             </section>
         </main>
     </div>
@@ -123,7 +123,11 @@ fetch('/login/header.html')
 
                 // Add to table
                 const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'N/A';
-              
+                const row = `
+                        ${adm.toFixed(2)}
+                       ${month.toFixed(2)}
+                       ${total.toFixed(2)}
+                    `;
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
 
