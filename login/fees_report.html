@@ -37,48 +37,126 @@ fetch('/login/header.html')
             </header>
             
             <section class="content-area">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
                     <div class="data-card">
-                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">TOTAL COLLECTION (MAY)</h4>
-                        <h2 style="color: #2ecc71;">$1,500.00</h2>
-                        <p style="font-size: 11px; color: #27ae60; margin-top: 5px;"><i class="fas fa-arrow-up"></i> 12% from last month</p>
+                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">TOTAL STUDENTS</h4>
+                        <h2 id="totalStudents" style="color: var(--primary-color);">0</h2>
+                        <div style="display: flex; gap: 10px; margin-top: 5px; font-size: 11px;">
+                            <span style="color: #2ecc71;">Active: <span id="activeStudents">0</span></span>
+                            <span style="color: #e74c3c;">Deactive: <span id="deactiveStudents">0</span></span>
+                        </div>
                     </div>
                     <div class="data-card">
-                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">TOTAL PENDING</h4>
-                        <h2 style="color: #e74c3c;">$350.00</h2>
-                        <p style="font-size: 11px; color: #c0392b; margin-top: 5px;"><i class="fas fa-exclamation-circle"></i> 5 Students pending</p>
+                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">TOTAL COLLECTION</h4>
+                        <h2 id="totalCollection" style="color: #2ecc71;">₹0.00</h2>
                     </div>
                     <div class="data-card">
-                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">NEW ADMISSIONS (YTD)</h4>
-                        <h2 style="color: var(--primary-color);">45</h2>
-                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Since January 2024</p>
+                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">ADMISSION FEES</h4>
+                        <h2 id="totalAdmissionFees" style="color: #3498db;">₹0.00</h2>
+                    </div>
+                    <div class="data-card">
+                        <h4 style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">MONTHLY FEES</h4>
+                        <h2 id="totalMonthlyFees" style="color: #f1c40f;">₹0.00</h2>
                     </div>
                 </div>
 
                 <div class="data-card">
-                    <h3>Monthly Summary</h3>
-                    <div style="height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0;">
-                        <!-- Mock Bar Chart -->
-                        <div style="flex: 1; background: var(--primary-color); height: 60%; border-radius: 4px 4px 0 0; position: relative;">
-                            <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px;">Jan</span>
-                        </div>
-                        <div style="flex: 1; background: var(--primary-color); height: 80%; border-radius: 4px 4px 0 0; position: relative;">
-                            <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px;">Feb</span>
-                        </div>
-                        <div style="flex: 1; background: var(--primary-color); height: 75%; border-radius: 4px 4px 0 0; position: relative;">
-                            <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px;">Mar</span>
-                        </div>
-                        <div style="flex: 1; background: var(--primary-color); height: 90%; border-radius: 4px 4px 0 0; position: relative;">
-                            <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px;">Apr</span>
-                        </div>
-                        <div style="flex: 1; background: var(--secondary-color); height: 95%; border-radius: 4px 4px 0 0; position: relative;">
-                            <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px;">May</span>
-                        </div>
-                    </div>
+                    <h3>Fee Collection History</h3>
+                    <table class="data-table" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Bill No</th>
+                                <th>Student Name</th>
+                                <th>Date</th>
+                                <th>Adm. Fee</th>
+                                <th>Month Fee</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feesTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
                 </div>
             </section>
         </main>
     </div>
-    <script src="dashboard-script.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
+            authDomain: "anandhavruksham-3aa36.firebaseapp.com",
+            projectId: "anandhavruksham-3aa36",
+            storageBucket: "anandhavruksham-3aa36.firebasestorage.app",
+            messagingSenderId: "604117717957",
+            appId: "1:604117717957:web:3df03ca1c702dba99331ac"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fetch Student Stats
+        onSnapshot(collection(db, "students"), (snapshot) => {
+            let total = snapshot.size;
+            let active = 0;
+            let deactive = 0;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Assuming "status" field exists, otherwise all are active for now
+                if (data.status === 'deactive') {
+                    deactive++;
+                } else {
+                    active++;
+                }
+            });
+
+            document.getElementById('totalStudents').textContent = total;
+            document.getElementById('activeStudents').textContent = active;
+            document.getElementById('deactiveStudents').textContent = deactive;
+        });
+
+        // Fetch Payment Stats
+        const qPayments = query(collection(db, "payments"), orderBy("createdAt", "desc"));
+        onSnapshot(qPayments, (snapshot) => {
+            let totalColl = 0;
+            let totalAdm = 0;
+            let totalMonth = 0;
+            const tableBody = document.getElementById('feesTableBody');
+            tableBody.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const adm = parseFloat(data.adm_fee || 0);
+                const month = parseFloat(data.month_fee || 0);
+                const total = adm + month;
+
+                totalColl += total;
+                totalAdm += adm;
+                totalMonth += month;
+
+                // Add to table
+                const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'N/A';
+                const row = `
+                    <tr>
+                        <td>${data.billNo || 'N/A'}</td>
+                        <td>${data.nm || 'N/A'}</td>
+                        <td>${date}</td>
+                        <td>₹${adm.toFixed(2)}</td>
+                        <td>₹${month.toFixed(2)}</td>
+                        <td>₹${total.toFixed(2)}</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('totalCollection').textContent = `₹${totalColl.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalAdmissionFees').textContent = `₹${totalAdm.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalMonthlyFees').textContent = `₹${totalMonth.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        });
+    </script>
 </body>
 </html>
