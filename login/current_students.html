@@ -39,7 +39,7 @@ fetch('/login/header.html')
             <section class="content-area">
                 <div class="data-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3>Active Student List</h3>
+                        <h3>Student List</h3>
                         <button class="btn-primary" onclick="addStudent()">Add New Student</button>
                     </div>
                     <table class="data-table">
@@ -84,11 +84,12 @@ fetch('/login/header.html')
                         snapshot.forEach((doc) => {
                             const data = doc.data();
                             const row = document.createElement("tr");
-                            if (data.status === 'active') {
-                                row.style.backgroundColor = 'none';
-                            } else {
-                                row.style.backgroundColor = '#f0f0f0';
+                           
+                            if (data.status === 'deactive') {
+                                row.style.backgroundColor = '#ffebeb'; // Light red background for deactive
+                                row.style.color = '#e74c3c'; // Red text for deactive
                             }
+
                             row.innerHTML = `
                                 <td>${count++}</td>
                                 <td>${data.nm}</td>
