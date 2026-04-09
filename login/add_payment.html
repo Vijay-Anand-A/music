@@ -92,7 +92,7 @@
                     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHup4M5P3z-fy9fVRElBx0hutREWZGSAM",
@@ -330,6 +330,26 @@
                 const feetype = feetypeArr.join(",");
 
                 try {
+                    // Check if student exists in current student list
+                    const studentsRef = collection(db, "students");
+                    const qStudent = query(studentsRef, where("nm", "==", studentName));
+                    const studentSnapshot = await getDocs(qStudent);
+                    
+                    if (studentSnapshot.empty) {
+                        // If student doesn't exist, create a new student record
+                        const newStudentRef = doc(collection(db, "students"));
+                        const studentData = {
+                            id: newStudentRef.id,
+                            nm: studentName,
+                            mob: phoneNo,
+                            course: courseName,
+                            status: "active",
+                            createdAt: serverTimestamp()
+                        };
+                        await setDoc(newStudentRef, studentData);
+                        console.log("New student added: ", studentName);
+                    }
+
                     let billNo;
                     let paymentRef;
                     
