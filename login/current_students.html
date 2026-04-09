@@ -84,6 +84,11 @@ fetch('/login/header.html')
                         snapshot.forEach((doc) => {
                             const data = doc.data();
                             const row = document.createElement("tr");
+                            if (data.status === 'active') {
+                                row.style.backgroundColor = 'none';
+                            } else {
+                                row.style.backgroundColor = '#f0f0f0';
+                            }
                             row.innerHTML = `
                                 <td>${count++}</td>
                                 <td>${data.nm}</td>
