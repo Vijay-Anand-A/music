@@ -116,6 +116,14 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select id="status" name="status">
+                                            <option value="active">Active</option>
+                                            <option value="deactive">Deactive</option>
+                                        </select>
+                                    </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn-secondary" onclick="window.parent.closePopup3()">Cancel</button>
@@ -213,6 +221,7 @@
                         document.getElementById('reference').value = data.refer || '';
                         document.getElementById('permanentAddress').value = data.addr || '';
                         document.getElementById('place').value = data.place || '';
+                        document.getElementById('status').value = data.status || 'active';
 
                         // Display existing photo
                         if (data.pic) {
@@ -259,7 +268,8 @@
                 const permanentAddress = document.getElementById('permanentAddress').value;
                 const place = document.getElementById('place').value;
                 const dobVal = document.getElementById('dob').value;
-                 const regDateVal = document.getElementById('regDate').value;
+                const regDateVal = document.getElementById('regDate').value;
+                const status = document.getElementById('status').value;
 
                  const studentData = {
                     adm_no: admissionNo,
@@ -275,6 +285,7 @@
                     refer: reference,
                     addr: permanentAddress,
                     place: place,
+                    status: status, // Store active/deactive status
                     pic: studentPhotoBase64 // Store Base64 photo string
                 };
 
