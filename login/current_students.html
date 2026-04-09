@@ -40,7 +40,13 @@ fetch('/login/header.html')
                 <div class="data-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3>Student List</h3>
-                        <button class="btn-primary" onclick="addStudent()">Add New Student</button>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div style="position: relative;">
+                                <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                                <input type="text" id="studentSearch" placeholder="Search by name, contact or course..." style="padding: 8px 10px 8px 35px; border: 1px solid #ddd; border-radius: 6px; width: 250px; outline: none; font-size: 14px;">
+                            </div>
+                            <button class="btn-primary" onclick="addStudent()">Add New Student</button>
+                        </div>
                     </div>
                     <table class="data-table">
                         <thead>
@@ -76,34 +82,57 @@ fetch('/login/header.html')
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-           const q = query(collection(db, "students"), orderBy("createdAt", "desc"));
-                    onSnapshot(q, (snapshot) => {
-                        const studentList = document.getElementById("studentList");
-                        studentList.innerHTML = "";
-                        let count = 1;
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            const row = document.createElement("tr");
-                           
-                            if (data.status === 'deactive') {
-                                row.style.backgroundColor = '#ffebeb'; // Light red background for deactive
-                                row.style.color = '#e74c3c'; // Red text for deactive
-                            }
+        
+        const studentList = document.getElementById("studentList");
+        const studentSearch = document.getElementById("studentSearch");
+        let allStudents = [];
 
-                            row.innerHTML = `
-                                <td>${count++}</td>
-                                <td>${data.nm}</td>
-                                <td>${data.mob}</td>
-                                <td>${data.course}</td>
-                                <td><i class="fas fa-trash" onclick="deleteStudent('${doc.id}')" style="color:red;cursor:pointer;"></i></td>
-                                <td><i class="fas fa-plus" onclick="editStudent('${doc.id}')" style="cursor:pointer;color:#6a11cb;" title="Add Detail"></i> &nbsp; 
-                                    <i class="fas fa-print" onclick="printApplication('${doc.id}')" style="cursor:pointer;color:#006400;" title="Print Application"></i></td>
-                            `;
-                            studentList.appendChild(row);
-                        });
-                    });
+        function renderStudents(students) {
+            studentList.innerHTML = "";
+            let count = 1;
+            const searchTerm = studentSearch.value.toLowerCase();
 
-               window.printApplication = (studentId) => {
+            students.forEach((doc) => {
+                const data = doc.data();
+                
+                // Filter logic
+                const name = (data.nm || "").toLowerCase();
+                const contact = (data.mob || "").toLowerCase();
+                const course = (data.course || "").toLowerCase();
+
+                if (name.includes(searchTerm) || contact.includes(searchTerm) || course.includes(searchTerm)) {
+                    const row = document.createElement("tr");
+                    
+                    if (data.status === 'deactive') {
+                        row.style.backgroundColor = '#ffebeb';
+                        row.style.color = '#e74c3c';
+                    }
+
+                    row.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${data.nm}</td>
+                        <td>${data.mob}</td>
+                        <td>${data.course}</td>
+                        <td><i class="fas fa-trash" onclick="deleteStudent('${doc.id}')" style="color:red;cursor:pointer;"></i></td>
+                        <td><i class="fas fa-plus" onclick="editStudent('${doc.id}')" style="cursor:pointer;color:#6a11cb;" title="Add Detail"></i> &nbsp; 
+                            <i class="fas fa-print" onclick="printApplication('${doc.id}')" style="cursor:pointer;color:#006400;" title="Print Application"></i></td>
+                    `;
+                    studentList.appendChild(row);
+                }
+            });
+        }
+
+        const q = query(collection(db, "students"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            allStudents = snapshot;
+            renderStudents(allStudents);
+        });
+
+        studentSearch.addEventListener('input', () => {
+            renderStudents(allStudents);
+        });
+
+        window.printApplication = (studentId) => {
                    window.open(`student_application.html?id=${studentId}`, '_blank');
                };
 
