@@ -59,6 +59,14 @@ fetch('/login/header.html')
                         <h2 id="totalMonthlyFees" style="color: #f1c40f;">₹0.00</h2>
                     </div>
                 </div>
+
+                <div class="data-card" style="margin-top: 30px;">
+                    <h3>Course-wise Student Count</h3>
+                    <div id="courseCounts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;">
+                        <!-- Course counts will be loaded here -->
+                        <p style="color: var(--text-muted);">Loading course statistics...</p>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
@@ -84,20 +92,50 @@ fetch('/login/header.html')
             let total = snapshot.size;
             let active = 0;
             let deactive = 0;
+            let courseMap = {};
 
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // Assuming "status" field exists, otherwise all are active for now
-                if (data.status === 'deactive') {
+                const status = data.status || 'active';
+                const course = data.course || 'Unassigned';
+
+                if (status === 'deactive') {
                     deactive++;
                 } else {
                     active++;
+                }
+
+                // Count by course (only for active students or all? 
+                // Usually total per course is more useful, but we can filter by active if needed. 
+                // Let's count all assigned to that course)
+                if (course) {
+                    courseMap[course] = (courseMap[course] || 0) + 1;
                 }
             });
 
             document.getElementById('totalStudents').textContent = total;
             document.getElementById('activeStudents').textContent = active;
             document.getElementById('deactiveStudents').textContent = deactive;
+
+            // Render Course Counts
+            const courseContainer = document.getElementById('courseCounts');
+            courseContainer.innerHTML = '';
+            
+            const sortedCourses = Object.keys(courseMap).sort();
+            if (sortedCourses.length === 0) {
+                courseContainer.innerHTML = '<p style="color: var(--text-muted);">No courses found.</p>';
+            } else {
+                sortedCourses.forEach(course => {
+                    const count = courseMap[course];
+                    const courseCard = `
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                            <h5 style="margin: 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase;">${course}</h5>
+                            <h3 style="margin: 5px 0 0; font-size: 20px; color: var(--primary-color);">${count} Students</h3>
+                        </div>
+                    `;
+                    courseContainer.insertAdjacentHTML('beforeend', courseCard);
+                });
+            }
         });
 
         // Fetch Payment Stats
