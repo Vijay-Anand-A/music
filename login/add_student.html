@@ -165,8 +165,8 @@
             studentPhotoInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    if (file.size > 2000000) { // 2MB limit for Base64 storage in Firestore
-                        alert("File too large! Please choose a photo smaller than 2MB.");
+                    if (file.size > 500000) { // 500KB limit for Base64 storage in Firestore
+                        alert("File too large! Please choose a photo smaller than 500KB.");
                         studentPhotoInput.value = "";
                         return;
                     }
